@@ -2,7 +2,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { setupSwagger } from './swagger.mjs';
 import router from './src/routers/Router.mjs';
-import pool from './src/database/SQLCon.mjs';
 
 // Setup express app
 dotenv.config();
