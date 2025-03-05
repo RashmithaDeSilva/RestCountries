@@ -21,7 +21,10 @@ async function setupDatabase() {
             );`
         );
         console.log("[INFO] - Users table created or already exists");
-        await pool.end();
+
+        if (process.env.ENV === 'PROD') {
+            await pool.end();
+        }
 
     } catch (error) {
         console.error("[ERROR] - Failed to create users table:", error);

@@ -1,3 +1,5 @@
 node_modules/
 .env
 note.txt
+Countries.json
+cw1.db
