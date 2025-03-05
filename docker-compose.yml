@@ -1,0 +1,35 @@
+version: '3.9'
+
+networks:
+  cw1_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.5.0/24
+
+services:
+  mysql:
+    image: mysql
+    container_name: mysql_db
+    restart: unles-stop
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_DATABASE: cw1
+    ports:
+      - "3306:3306"
+    networks:
+      - cw1_network
+
+  node_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: node_app
+    restart: unles-stop
+    working_dir: /app
+    ports:
+      - "3001:3001"
+    networks:
+      - cw1_network
+    depends_on:
+      - mysql
