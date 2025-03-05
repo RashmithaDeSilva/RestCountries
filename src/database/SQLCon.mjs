@@ -15,7 +15,7 @@ async function initializeDatabase() {
         });
         
         // Create database if it doesn't exist
-        await connection.query(`CREATE DATABASE IF NOT EXISTS ${ process.env.MSQL_DB_NAME || "cw1" }`);
+        await connection.query(`CREATE DATABASE IF NOT EXISTS ${ process.env.DB_NAME || "cw1" }`);
         await connection.end();
 
         console.log('[INFO] - Database ensured');
@@ -25,7 +25,7 @@ async function initializeDatabase() {
             host: process.env.DB_HOST || "localhost",
             user: process.env.DB_USER || "root",
             password: process.env.DB_PASSWORD || "12345",
-            database: process.env.MSQL_DB_NAME || "cw1",
+            database: process.env.DB_NAME || "cw1",
             waitForConnections: true,
             connectionLimit: 10,
             queueLimit: 0
@@ -47,10 +47,11 @@ if (process.env.ENV === "PROD") {
 
 } else if (process.env.ENV === "DEV") {
     sqlite3.verbose(); // Enable verbose mode for debugging
-    pool = new sqlite3.Database('./cw1.db', (err) => {
+    pool = new sqlite3.Database(`./${ process.env.DB_NAME }.db`, (err) => {
         if (err) {
             console.error('[ERROR] - SQLite Connection Failed...', err);
             process.exit(1);
+            
         } else {
             console.log('[INFO] - SQLite Connected Successfully!');
         }
