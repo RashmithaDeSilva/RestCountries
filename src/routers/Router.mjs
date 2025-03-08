@@ -1,9 +1,11 @@
 import { Router } from 'express';
 import dotenv from 'dotenv';
-import StandardResponse from '../utils/StandardResponse.mjs';
+import Response from '../utils/Response.mjs';
+import AuthRouter from './AuthRouter.mjs';
 
 dotenv.config();
 const router = Router();
+router.use('/auth/', AuthRouter);
 const API_VERSION = process.env.API_VERSION;
 
 /**
@@ -30,11 +32,42 @@ router.get('/', (req, res) => {
     if (process.env.ENV === "DEV") {
         msg = `Welcome to the API, Use '/api/${ API_VERSION }/api-docs' for Swagger documentation (Only working on Developer mode).`;
     }
-    res.status(200).send(StandardResponse(true, msg, null, null));
+    res.status(200).send(Response.StandardResponse(true, msg, null, null));
 });
 
+/**
+ * @swagger
+ * /api/v1/{any}:
+ *   all:
+ *     summary: Invalid endpoint
+ *     description: Handles all undefined routes and returns a 404 error.
+ *     parameters:
+ *       - in: path
+ *         name: any
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Any undefined route
+ *     responses:
+ *       404:
+ *         description: Not Found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Not Found !"
+ *                 redirect:
+ *                   type: string
+ *                   example: "Invalid endpoint, redirect to '/api/v1/auth'"
+ */
 router.all("*", (req, res) => {
-    return res.status(404).send(StandardResponse(false, "Not Found !", null, 
+    return res.status(404).send(Response.StandardResponse(false, "Not Found !", null, 
         `Invalid endpoint, redirect to '/api/${ API_VERSION }/auth'`));
 });
 

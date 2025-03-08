@@ -32,7 +32,7 @@ async function initializeDatabase() {
 
         } else if (process.env.ENV === "DEV") {
             sqlite3.verbose();
-            pool = new sqlite3.Database(`./${process.env.DB_NAME || "dev"}.db`, (err) => {
+            pool = new sqlite3.Database(`./${ process.env.DB_NAME || "dev" }.db`, (err) => {
                 if (err) {
                     console.error("[ERROR] - SQLite Connection Failed...", err);
                     process.exit(1);

@@ -8,9 +8,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 const API_VERSION = process.env.API_VERSION || 'v0';
+const ENV = process.env.ENV || 'DEV';
 
 // Swagger setup
-if (process.env.ENV === "DEV") {
+if (ENV === "DEV") {
     setupSwagger(app);
 }
 
@@ -20,7 +21,7 @@ app.use(`/api/${ API_VERSION }/`, router);
 
 app.listen(PORT, ()=>{
     console.log(`[INFO] - Server is running on http://localhost:${ PORT }`);
-    if (process.env.ENV === "DEV") {
+    if (ENV === "DEV") {
         console.log(`[INFO] - Swagger doc available on http://localhost:${ PORT }/api/${ API_VERSION }/api-docs`);
     }
 });

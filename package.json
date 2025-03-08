@@ -7,8 +7,8 @@
     "start": "npm run setup-db-prod && cross-env ENV=PROD node index.mjs",
     "dev": "npm run setup-db-dev && cross-env ENV=DEV nodemon index.mjs",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "setup-db-prod": "cross-env ENV=PROD node ./src/database/TableSetup.mjs",
-    "setup-db-dev": "cross-env ENV=DEV node ./src/database/TableSetup.mjs"
+    "setup-db-prod": "cross-env ENV=PROD node ./src/config/TableSetup.mjs",
+    "setup-db-dev": "cross-env ENV=DEV node ./src/config/TableSetup.mjs"
   },
   "repository": {
     "type": "git",
@@ -21,9 +21,13 @@
   },
   "homepage": "https://github.com/RashmithaDeSilva/6COSC022C.2_CW1#readme",
   "dependencies": {
+    "argon2": "^0.41.1",
+    "connect-redis": "^8.0.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "mysql2": "^3.12.0"
+    "express-validator": "^7.2.1",
+    "mysql2": "^3.12.0",
+    "redis": "^4.7.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
