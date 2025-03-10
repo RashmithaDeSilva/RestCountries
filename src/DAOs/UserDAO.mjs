@@ -1,4 +1,5 @@
 import { getDatabasePool } from '../config/SQLCon.mjs';
+import UserModel from '../models/UserModel.mjs';
 import DatabaseErrors from '../utils/errors/DatabaseErrors.mjs';
 import dotenv from 'dotenv';
 
@@ -10,19 +11,18 @@ class UserDAO {
     }
 
     // Check email is exist
-    async checkEmail (email) {
+    async checkEmail(email) {
         try {
             const [row] = await pool.query("SELECT email FROM users WHERE email = ?", [email]);
-            if (row.length > 0) {
-                throw new Error(DatabaseErrors.EMAIL_ALREADY_EXISTS);
-            }
+            return row.length > 0;
+
         } catch (error) {
             throw error;
         }
     }
 
     // Get user ID using email
-    async getUserId (email) {
+    async getUserId(email) {
         try {
             const [row] = await pool.query("SELECT id FROM users WHERE email = ?", [email]);
             if (row.length > 0) {
@@ -37,7 +37,10 @@ class UserDAO {
     async create (user) {
         try {
             // Check email is exist
-            await this.checkEmail(user.email);
+            if (await this.checkEmail(user.email)) {
+                throw new Error(DatabaseErrors.EMAIL_ALREADY_EXISTS);
+            }
+            
             const [result] = await pool.query(`
                 INSERT INTO users (
                     first_name, 
@@ -51,6 +54,44 @@ class UserDAO {
             const userId = process.env.ENV === "PROD" ? 
             result.insertId : await this.getUserId(user.email);
             return userId;
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getHashPassword(email) {
+        try {
+            // Check email is exist
+            if (!await this.checkEmail(email)) {
+                throw new Error(DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD);
+            }
+
+            const [row] = await pool.query(`SELECT password_hash FROM users WHERE email = ?`, [email]);
+            return row[0].password_hash;
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getUser(email) {
+        try {
+            // Check email is exist
+            if (!await this.checkEmail(email)) {
+                throw new Error(DatabaseErrors.INVALID_EMAIL_ADDRESS);
+            }
+            
+            const [row] = await pool.query(`SELECT * FROM users WHERE email = ?`, [email]);
+            return new UserModel(
+                row[0].first_name, 
+                row[0].surname,
+                row[0].email,
+                row[0].contact_number,
+                row[0].verify,
+                row[0].password_hash,
+                row[0].id
+            );
 
         } catch (error) {
             throw error;

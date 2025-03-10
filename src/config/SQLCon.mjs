@@ -37,7 +37,7 @@ async function initializeDatabase() {
                     console.error("[ERROR] - SQLite Connection Failed...", err);
                     process.exit(1);
                 } else {
-                    console.log("[INFO] - SQLite Connected Successfully!");
+                    console.log("[INFO] - SQLite Connected Successfully");
                 }
             });
 

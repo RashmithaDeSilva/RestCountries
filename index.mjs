@@ -2,6 +2,17 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { setupSwagger } from './swagger.mjs';
 import router from './src/routers/Router.mjs';
+import UserService from './src/services/UserService.mjs';
+import session from 'express-session';
+
+try {
+    const x = new UserService();
+    const xx = await x.getHashPassword("user@example.com");
+    console.log(xx);
+    
+} catch (error) {
+    console.log(error);
+}
 
 // Setup express app
 dotenv.config();
@@ -18,6 +29,8 @@ if (ENV === "DEV") {
 // Middleware
 app.use(express.json());
 app.use(`/api/${ API_VERSION }/`, router);
+
+
 
 app.listen(PORT, ()=>{
     console.log(`[INFO] - Server is running on http://localhost:${ PORT }`);

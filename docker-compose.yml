@@ -10,13 +10,22 @@ networks:
 services:
   mysql:
     image: mysql
-    container_name: mysql_db
+    container_name: main_database
     restart: unles-stop
     environment:
       MYSQL_ROOT_PASSWORD: 12345
       MYSQL_DATABASE: cw1
     ports:
       - "3306:3306"
+    networks:
+      - cw1_network
+
+  redis:
+    image: redis:7.4-alpine3.21
+    container_name: session_store
+    restart: unles-stop
+    ports:
+      - "6379:6379"
     networks:
       - cw1_network
 

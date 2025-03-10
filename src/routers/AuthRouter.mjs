@@ -5,10 +5,56 @@ import Response from '../utils/Response.mjs';
 import UserValidationSchema from '../utils/validations/UserValidationSchema.mjs';
 import UserService from '../services/UserService.mjs';
 import DatabaseErrors from '../utils/errors/DatabaseErrors.mjs';
+import SessionService from '../services/SessionService.mjs';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 const router = Router();
 const userService = new UserService();
+const sessionService = new SessionService();
+
+router.post('/', [
+    checkSchema({
+        ...UserValidationSchema.emailValidation(),
+        ...UserValidationSchema.passwordValidation(),
+    })
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).send(Response.StandardResponse(
+            false,
+            "Validation error.",
+            null,
+            errors.array()
+        ));
+    }
+
+    const data = matchedData(req);
+
+    try {
+        const data = matchedData(req);
+        const user = await userService.authenticateUser(data.email, data.password);
+        const sessionId = await sessionService.createSession(user.id, { email: user.email, verify: user.verify });
+        const token = jwt.sign({ sessionId }, process.env.JWT_SESSION_SECRET, { expiresIn: process.env.JWT_SESSION_EX_TIME });
+
+        res.cookie('sessionId', token, {
+            httpOnly: true,
+            secure: process.env.ENV === 'PROD',
+            sameSite: 'Strict',
+            maxAge: parseInt(process.env.JWT_SESSION_EX_TIME)
+        });
+
+        return res.send(Response.StandardResponse(
+            true,
+            "Authenticated.",
+            token,
+            "Authenticated successfully"
+        ));
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
 
 /**
  * @swagger
@@ -139,9 +185,9 @@ router.post('/register', [
         userId = await userService.createUser(data);
     } catch (error) {
         if (error.message === DatabaseErrors.EMAIL_ALREADY_EXISTS) {
-            return res.status(409).send(Response.StandardResponse(
+            return res.status(400).send(Response.StandardResponse(
                 false,
-                "Email already exists.",
+                "Validation error.",
                 null,
                 error.message
             ));
