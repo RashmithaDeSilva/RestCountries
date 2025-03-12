@@ -5,18 +5,16 @@ import Response from '../utils/Response.mjs';
 import UserValidationSchema from '../utils/validations/UserValidationSchema.mjs';
 import UserService from '../services/UserService.mjs';
 import DatabaseErrors from '../utils/errors/DatabaseErrors.mjs';
-import SessionService from '../services/SessionService.mjs';
 import passport from 'passport';
 import CommonErrors from '../utils/errors/CommonErrors.mjs';
 
 dotenv.config();
 const router = Router();
 const userService = new UserService();
-const sessionService = new SessionService();
 
 /**
  * @swagger
- * /auth:
+ * /api/v1/auth:
  *   post:
  *     summary: Authenticate user
  *     description: Authenticates a user using email and password, returning a session if successful.

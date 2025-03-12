@@ -22,8 +22,7 @@
   "homepage": "https://github.com/RashmithaDeSilva/6COSC022C.2_CW1#readme",
   "dependencies": {
     "argon2": "^0.41.1",
-    "connect-redis": "^8.0.1",
-    "cookie-parser": "^1.4.7",
+    "connect-redis": "^8.0.2",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-session": "^1.18.1",

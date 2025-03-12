@@ -5,7 +5,7 @@ import session from 'express-session';
 import router from './src/routers/Router.mjs';
 import passport from 'passport';
 import './src/strategies/local-strategy.mjs';
-import cookieParser from 'cookie-parser';
+import redisSessionStore from './src/config/RedisCon.mjs';
 
 // Setup express app
 dotenv.config();
@@ -21,9 +21,10 @@ if (ENV === "DEV") {
 
 // Session setup
 app.use(session({
+    store: redisSessionStore,
     secret: process.env.SESSION_SECRET,
-    saveUninitialized: false,
-    resave: false,
+    saveUninitialized: false, // recommended: only save session when data exists
+    resave: false, // required: force lightweight session keep alive (touch)
     cookie: {
         maxAge: Number(process.env.COOKIE_EX_TIME),
     },
