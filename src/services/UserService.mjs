@@ -43,28 +43,27 @@ class UserService {
     }
 
     // Get user
-    async getUser(email) {
-        try {
-            const user = await this.userDAO.getUser(data.email);
-            if (!user) throw new Error(DatabaseErrors.USER_NOT_FOUND);
-            return user;
+    // async getUser(email) {
+    //     try {
+    //         const user = await this.userDAO.getUser(data.email);
+    //         if (!user) throw new Error(DatabaseErrors.USER_NOT_FOUND);
+    //         return user;
             
-        } catch (error) {
-            if (process.env.ENV === "DEV") {
-                throw error;
-            }
+    //     } catch (error) {
+    //         if (process.env.ENV === "DEV") {
+    //             throw error;
+    //         }
 
-            await this.errorLogService.createLog("UserService.authenticateUser", error, data);
-            throw new Error(CommonErrors.INTERNAL_SERVER_ERROR);
-        }
-    }
+    //         await this.errorLogService.createLog("UserService.authenticateUser", error, data);
+    //         throw new Error(CommonErrors.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
     // Authenticat user
-    async authenticateUser(data) {
+    async authenticateUser(email, password) {
         try {
-            const user = await this.userDAO.getUser(data.email);
-            const passwordVerify = await verify(user.passwordHash, data.password);
-            user.passwordVerify = passwordVerify;
+            const user = await this.userDAO.getUser(email);
+            const passwordVerify = await verify(user.passwordHash, password);
             if (!passwordVerify) throw new Error(DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD);
             return user;
             
@@ -73,7 +72,23 @@ class UserService {
                 throw error;
             }
 
-            await this.errorLogService.createLog("UserService.authenticateUser", error, data);
+            await this.errorLogService.createLog("UserService.authenticateUser", error, { email });
+            throw new Error(CommonErrors.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async findUser(id) {
+        try {
+            const user = await this.userDAO.findUser(id);
+            if (!user) throw new Error(DatabaseErrors.USER_NOT_FOUND);
+            return user;
+            
+        } catch (error) {
+            if (process.env.ENV === "DEV") {
+                throw error;
+            }
+
+            await this.errorLogService.createLog("UserService.findUser", error, id);
             throw new Error(CommonErrors.INTERNAL_SERVER_ERROR);
         }
     }

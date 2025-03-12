@@ -1,18 +1,11 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { setupSwagger } from './swagger.mjs';
-import router from './src/routers/Router.mjs';
-import UserService from './src/services/UserService.mjs';
 import session from 'express-session';
-
-try {
-    const x = new UserService();
-    const xx = await x.getHashPassword("user@example.com");
-    console.log(xx);
-    
-} catch (error) {
-    console.log(error);
-}
+import router from './src/routers/Router.mjs';
+import passport from 'passport';
+import './src/strategies/local-strategy.mjs';
+import cookieParser from 'cookie-parser';
 
 // Setup express app
 dotenv.config();
@@ -26,11 +19,25 @@ if (ENV === "DEV") {
     setupSwagger(app);
 }
 
+// Session setup
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    resave: false,
+    cookie: {
+        maxAge: Number(process.env.COOKIE_EX_TIME),
+    },
+}));
+
+// Passport setup
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Middleware
 app.use(express.json());
+
+// Routers setup
 app.use(`/api/${ API_VERSION }/`, router);
-
-
 
 app.listen(PORT, ()=>{
     console.log(`[INFO] - Server is running on http://localhost:${ PORT }`);

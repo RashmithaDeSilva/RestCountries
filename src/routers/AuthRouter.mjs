@@ -6,55 +6,178 @@ import UserValidationSchema from '../utils/validations/UserValidationSchema.mjs'
 import UserService from '../services/UserService.mjs';
 import DatabaseErrors from '../utils/errors/DatabaseErrors.mjs';
 import SessionService from '../services/SessionService.mjs';
-import jwt from 'jsonwebtoken';
+import passport from 'passport';
+import CommonErrors from '../utils/errors/CommonErrors.mjs';
 
 dotenv.config();
 const router = Router();
 const userService = new UserService();
 const sessionService = new SessionService();
 
+/**
+ * @swagger
+ * /auth:
+ *   post:
+ *     summary: Authenticate user
+ *     description: Authenticates a user using email and password, returning a session if successful.
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *                 description: User's email address
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: MySecurePassword123
+ *                 description: User's password
+ *     responses:
+ *       200:
+ *         description: Successfully authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 messesge:
+ *                   type: string
+ *                   example: Authenticated.
+ *                 data:
+ *                   type: string
+ *                   nullable: true
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   nullable: true
+ *                   example: null
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 messesge:
+ *                   type: string
+ *                   example: Validation error.
+ *                 data:
+ *                   type: string
+ *                   nullable: true
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                   example: [{ "type": "field", "value": "user@example", "msg": { "error": "Invalid email format!" }, "path": "email", "location": "body" }]
+ *       401:
+ *         description: Authentication failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 messesge:
+ *                   type: string
+ *                   example: Authentication failed
+ *                 data:
+ *                   type: string
+ *                   nullable: true
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: "Invalid email or password."
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 messesge:
+ *                   type: string
+ *                   example: Internal Server Error
+ *                 data:
+ *                   type: string
+ *                   nullable: true
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: Internal Server Error
+ */
 router.post('/', [
     checkSchema({
         ...UserValidationSchema.emailValidation(),
         ...UserValidationSchema.passwordValidation(),
-    })
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).send(Response.StandardResponse(
-            false,
-            "Validation error.",
-            null,
-            errors.array()
-        ));
+    }),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).send(Response.StandardResponse(
+                false,
+                "Validation error.",
+                null,
+                errors.array()
+            ));
+        }
+        next();
+    },
+    (req, res, next) => {
+        passport.authenticate('local', (err, user, info) => {
+            if (err) {
+                return res.status(500).send(Response.StandardResponse(
+                    false,
+                    CommonErrors.INTERNAL_SERVER_ERROR,
+                    null,
+                    err.message
+                ));
+            }
+            if (!user) {
+                return res.status(401).send(Response.StandardResponse(
+                    false,
+                    CommonErrors.AUTHENTICATION_FAILED,
+                    null,
+                    info // This comes from `done(null, false, DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD)`
+                ));
+            }
+
+            req.logIn(user, (loginErr) => {
+                if (loginErr) {
+                    return res.status(500).send(Response.StandardResponse(
+                        false,
+                        CommonErrors.AUTHENTICATION_FAILED,
+                        null,
+                        loginErr.message
+                    ));
+                }
+                return res.status(200).send(Response.StandardResponse(
+                    true,
+                    "Authenticated.",
+                    null,
+                    null
+                ));
+            });
+        })(req, res, next);
     }
-
-    const data = matchedData(req);
-
-    try {
-        const data = matchedData(req);
-        const user = await userService.authenticateUser(data.email, data.password);
-        const sessionId = await sessionService.createSession(user.id, { email: user.email, verify: user.verify });
-        const token = jwt.sign({ sessionId }, process.env.JWT_SESSION_SECRET, { expiresIn: process.env.JWT_SESSION_EX_TIME });
-
-        res.cookie('sessionId', token, {
-            httpOnly: true,
-            secure: process.env.ENV === 'PROD',
-            sameSite: 'Strict',
-            maxAge: parseInt(process.env.JWT_SESSION_EX_TIME)
-        });
-
-        return res.send(Response.StandardResponse(
-            true,
-            "Authenticated.",
-            token,
-            "Authenticated successfully"
-        ));
-
-    } catch (error) {
-        return res.status(500).json({ success: false, message: 'Internal server error' });
-    }
-});
+]);
 
 /**
  * @swagger
@@ -62,6 +185,8 @@ router.post('/', [
  *   post:
  *     summary: Register a new user
  *     description: Validates user input and registers a new user if valid.
+ *     tags:
+ *      - Authentication
  *     requestBody:
  *       required: true
  *       content:

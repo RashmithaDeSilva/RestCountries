@@ -15,7 +15,7 @@ class SessionService {
     // Create new session
     async createSession (userId, data) {
         try {
-            const sessionId = await this.sessionStoreDAO.createSesion(
+            const sessionId = await this.sessionStoreDAO.createSession(
                 new SessionModel(userId, data));
             return sessionId;
 

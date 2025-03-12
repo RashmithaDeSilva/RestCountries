@@ -88,9 +88,27 @@ class UserDAO {
                 row[0].surname,
                 row[0].email,
                 row[0].contact_number,
-                row[0].verify,
                 row[0].password_hash,
-                row[0].id
+                row[0].id,
+                row[0].verify,
+            );
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async findUser(id) {
+        try {
+            const [row] = await pool.query(`SELECT * FROM users WHERE id = ?`, [id]);
+            return row.length === 0 ? null : new UserModel(
+                row[0].first_name, 
+                row[0].surname,
+                row[0].email,
+                row[0].contact_number,
+                row[0].password_hash,
+                row[0].id,
+                row[0].verify,
             );
 
         } catch (error) {

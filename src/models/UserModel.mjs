@@ -1,17 +1,17 @@
 class UserModel {
 
-    constructor (firstName, surname, email, contactNumber, verify, passwordHash = null, id = null) {
+    constructor (firstName, surname, email, contactNumber, passwordHash = null, id = null, verify = false) {
         this.firstName = firstName;
         this.surname = surname;
         this.email = email;
         this.contactNumber = contactNumber;
-        this.verify = verify;
         this.passwordHash = passwordHash;
         this.id = id;
+        this.verify = verify;
     }
 
     // Creating request model with passwordHash
-    static getRequestUserModel(firstName, surname, email, contactNumber, verify, passwordHash) {
+    static getRequestUserModel(firstName, surname, email, contactNumber, passwordHash) {
         return new UserModel(firstName, surname, email, contactNumber, passwordHash);
     }
 
