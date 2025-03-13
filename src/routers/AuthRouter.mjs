@@ -30,12 +30,12 @@ const userService = new UserService();
  *               email:
  *                 type: string
  *                 format: email
- *                 example: user@example.com
+ *                 example: user55@example.com
  *                 description: User's email address
  *               password:
  *                 type: string
  *                 format: password
- *                 example: MySecurePassword123
+ *                 example: 123456789012
  *                 description: User's password
  *     responses:
  *       200:

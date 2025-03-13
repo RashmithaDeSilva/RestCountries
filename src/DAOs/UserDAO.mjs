@@ -34,7 +34,8 @@ class UserDAO {
         }
     }
 
-    async create (user) {
+    // Create user
+    async create(user) {
         try {
             // Check email is exist
             if (await this.checkEmail(user.email)) {
@@ -60,6 +61,7 @@ class UserDAO {
         }
     }
 
+    // Get password hash
     async getHashPassword(email) {
         try {
             // Check email is exist
@@ -75,6 +77,7 @@ class UserDAO {
         }
     }
 
+    // Get user using email
     async getUser(email) {
         try {
             // Check email is exist
@@ -98,6 +101,7 @@ class UserDAO {
         }
     }
 
+    // Get user using id
     async findUser(id) {
         try {
             const [row] = await pool.query(`SELECT * FROM users WHERE id = ?`, [id]);
@@ -110,6 +114,28 @@ class UserDAO {
                 row[0].id,
                 row[0].verify,
             );
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Update user
+    async update(user) {
+        try {
+            // Check email is exist
+            const id = await this.getUserId(user.email);
+            if (id !== null && id !== user.id) {
+                throw new Error(DatabaseErrors.EMAIL_ALREADY_EXISTS);
+            }
+            
+            const [result] = await pool.query(`
+                UPDATE users 
+                SET first_name = ?, surname = ?, email = ?, contact_number = ?
+                WHERE id = ?
+            `, [user.firstName, user.surname, user.email, user.contactNumber, user.id]);
+
+            return user.id;
 
         } catch (error) {
             throw error;

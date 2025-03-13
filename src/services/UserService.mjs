@@ -48,6 +48,38 @@ class UserService {
         }
     }
 
+    // Update user
+    async updateUser(data) {
+        try {
+            // Create user model
+            const user = new UserModel(
+                data.first_name,
+                data.surname,
+                data.email,
+                data.contact_number,
+                null,
+                data.id
+            );
+
+            // Update user in database
+            return await this.userDAO.update(user);
+
+        } catch (error) {
+            if (process.env.ENV === "DEV") {
+                throw error;
+            }
+
+            switch (error.message) {
+                case DatabaseErrors.EMAIL_ALREADY_EXISTS:
+                    throw error;
+
+                default:
+                    await this.errorLogService.createLog("UserService.createUser", error, data);
+                    throw new Error(CommonErrors.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
     // Get user
     // async getUser(email) {
     //     try {
