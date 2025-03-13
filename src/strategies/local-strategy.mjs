@@ -2,7 +2,6 @@ import passport from "passport";
 import { Strategy } from "passport-local";
 import UserService from "../services/UserService.mjs";
 import DatabaseErrors from "../utils/errors/DatabaseErrors.mjs";
-import HashErrors from "../utils/errors/HashErrors.mjs";
 import CommonErrors from "../utils/errors/CommonErrors.mjs";
 import ErrorLogService from "../services/ErrorLogService.mjs";
 
@@ -37,7 +36,6 @@ export default passport.use(
 
         } catch (error) {
             if (error.message === DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD 
-                || error.message === HashErrors.HASH_VERIFICATION_FAILED
                 || error.message === DatabaseErrors.INVALID_EMAIL_ADDRESS) {
                 return done(null, false, DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD);  // Expected errors
             }
@@ -45,9 +43,7 @@ export default passport.use(
             if (process.env.ENV === "DEV") {
                 throw error;
             }
-
-            await errorLogService.createLog("local-strategy.passport", error, { email });
-            throw new Error(CommonErrors.INTERNAL_SERVER_ERROR); // Unexpected errors (500)
+            return done(null, false, CommonErrors.INTERNAL_SERVER_ERROR); // Unexpected errors (500)
         }
     })
 );

@@ -37,8 +37,14 @@ class UserService {
                 throw error;
             }
 
-            await this.errorLogService.createLog("UserService.createUser", error, data);
-            throw new Error(CommonErrors.INTERNAL_SERVER_ERROR);
+            switch (error.message) {
+                case DatabaseErrors.EMAIL_ALREADY_EXISTS:
+                    throw error;
+
+                default:
+                    await this.errorLogService.createLog("UserService.createUser", error, data);
+                    throw new Error(CommonErrors.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
@@ -72,8 +78,17 @@ class UserService {
                 throw error;
             }
 
-            await this.errorLogService.createLog("UserService.authenticateUser", error, { email });
-            throw new Error(CommonErrors.INTERNAL_SERVER_ERROR);
+            switch (error.message) {
+                case DatabaseErrors.INVALID_EMAIL_ADDRESS:
+                    throw error;
+
+                case DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD:
+                    throw error;
+
+                default:
+                    await this.errorLogService.createLog("UserService.authenticateUser", error, { email });
+                    throw new Error(CommonErrors.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
