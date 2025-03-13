@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import dotenv from 'dotenv';
 import { validationResult, matchedData, checkSchema } from 'express-validator';
-import Response from '../utils/Response.mjs';
+import StandardResponse from '../utils/responses/StandardResponse.mjs';
 import UserValidationSchema from '../utils/validations/UserValidationSchema.mjs';
 import UserService from '../services/UserService.mjs';
 import DatabaseErrors from '../utils/errors/DatabaseErrors.mjs';
 import passport from 'passport';
 import CommonErrors from '../utils/errors/CommonErrors.mjs';
+import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
 
 dotenv.config();
 const router = Router();
@@ -30,7 +31,7 @@ const userService = new UserService();
  *               email:
  *                 type: string
  *                 format: email
- *                 example: user55@example.com
+ *                 example: user@example.com
  *                 description: User's email address
  *               password:
  *                 type: string
@@ -126,47 +127,27 @@ router.post('/', [
         ...UserValidationSchema.emailValidation(),
         ...UserValidationSchema.passwordValidation(),
     }),
-    (req, res, next) => {
+    async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).send(Response.StandardResponse(
-                false,
-                "Validation error.",
-                null,
-                errors.array()
-            ));
+            return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, null, errors);
         }
         next();
     },
-    (req, res, next) => {
-        passport.authenticate('local', (err, user, info) => {
-            if (err) {
-                return res.status(500).send(Response.StandardResponse(
-                    false,
-                    CommonErrors.INTERNAL_SERVER_ERROR,
-                    null,
-                    err.message
-                ));
+    async (req, res, next) => {
+        passport.authenticate('local', async (error, user) => {
+            if (error) {
+                return await ErrorResponse(error, res);
             }
             if (!user) {
-                return res.status(401).send(Response.StandardResponse(
-                    false,
-                    CommonErrors.AUTHENTICATION_FAILED,
-                    null,
-                    info // This comes from `done(null, false, DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD)`
-                ));
+                return await ErrorResponse(new Error(DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD), res);
             }
 
-            req.logIn(user, (loginErr) => {
+            req.logIn(user, async (loginErr) => {
                 if (loginErr) {
-                    return res.status(500).send(Response.StandardResponse(
-                        false,
-                        CommonErrors.AUTHENTICATION_FAILED,
-                        null,
-                        loginErr.message
-                    ));
+                    return await ErrorResponse(new Error(CommonErrors.AUTHENTICATION_FAILED), res);
                 }
-                return res.status(200).send(Response.StandardResponse(
+                return res.status(200).send(StandardResponse(
                     true,
                     "Authenticated.",
                     null,
@@ -293,12 +274,7 @@ router.post('/register', [
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).send(Response.StandardResponse(
-            false,
-            "Validation error.",
-            null,
-            errors.array()
-        ));
+        return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, null, errors);
     }
 
     const data = matchedData(req);
@@ -306,24 +282,12 @@ router.post('/register', [
 
     try {
         userId = await userService.createUser(data);
+
     } catch (error) {
-        if (error.message === DatabaseErrors.EMAIL_ALREADY_EXISTS) {
-            return res.status(400).send(Response.StandardResponse(
-                false,
-                "Validation error.",
-                null,
-                error.message
-            ));
-        }
-        return res.status(500).send(Response.StandardResponse(
-            false,
-            "Internal server error.",
-            null,
-            error.message
-        ));
+        return await ErrorResponse(error, res);
     }
 
-    res.status(201).send(Response.StandardResponse(
+    return res.status(201).send(StandardResponse(
         true,
         "User registered successfully.",
         {

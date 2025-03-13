@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import dotenv from 'dotenv';
-import Response from '../utils/Response.mjs';
+import StandardResponse from '../utils/responses/StandardResponse.mjs';
 import AuthRouter from './AuthRouter.mjs';
 import UserRouter from './UserRouter.mjs';
+import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
+import CommonErrors from '../utils/errors/CommonErrors.mjs';
 
 dotenv.config();
 const router = Router();
@@ -34,7 +36,7 @@ router.get('/', (req, res) => {
     if (process.env.ENV === "DEV") {
         msg = `Welcome to the API, Use '/api/${ API_VERSION }/api-docs' for Swagger documentation (Only working on Developer mode).`;
     }
-    res.status(200).send(Response.StandardResponse(true, msg, null, null));
+    res.status(200).send(StandardResponse(true, msg, null, null));
 });
 
 /**
@@ -69,8 +71,7 @@ router.get('/', (req, res) => {
  *                   example: "Invalid endpoint, redirect to '/api/v1/auth'"
  */
 router.all("*", (req, res) => {
-    return res.status(404).send(Response.StandardResponse(false, "Not Found !", null, 
-        `Invalid endpoint, redirect to '/api/${ API_VERSION }/auth'`));
+    return ErrorResponse(new Error(CommonErrors.NOT_FOUND), res);
 });
 
 export default router;

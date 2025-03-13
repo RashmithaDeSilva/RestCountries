@@ -1,5 +1,5 @@
 import argon2 from "argon2";
-import HashErros from '../errors/HashErrors.mjs';
+import HashErrors from '../errors/HashErrors.mjs';
 
 const generateHash = async (password) => {
     try {
@@ -11,7 +11,7 @@ const generateHash = async (password) => {
         });
 
     } catch (error) {
-        throw new Error(HashErros.HASHING_FAILED);
+        throw new Error(HashErrors.HASHING_FAILED);
     }
 };
 
@@ -20,7 +20,7 @@ const verify = async (hash, password) => {
         return await argon2.verify(hash, password);
 
     } catch (error) {
-        throw new Error(HashErros.HASH_VERIFICATION_FAILED);
+        throw new Error(HashErrors.HASH_VERIFICATION_FAILED);
     }
 };
 

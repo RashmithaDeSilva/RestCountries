@@ -1,11 +1,9 @@
 import { Router } from 'express';
 import dotenv from 'dotenv';
 import { validationResult, matchedData, checkSchema } from 'express-validator';
-import Response from '../utils/Response.mjs';
+import StandardResponse from '../utils/responses/StandardResponse.mjs';
 import UserValidationSchema from '../utils/validations/UserValidationSchema.mjs';
 import UserService from '../services/UserService.mjs';
-import DatabaseErrors from '../utils/errors/DatabaseErrors.mjs';
-import passport from 'passport';
 import CommonErrors from '../utils/errors/CommonErrors.mjs';
 import isAuthenticated from '../middlewares/AuthMiddleware.mjs';
 
@@ -82,17 +80,16 @@ const userService = new UserService();
  *                   example: null
  *                 error:
  *                   type: "null"
- *                   example: "Invalid email or password."
+ *                   example: null
  * components:
  *   securitySchemes:
- *     bearerAuth:
+ *     cookieAuth:
  *       type: apiKey
- *       in: header
- *       name: Authorization
+ *       in: cookie
+ *       name: connect.sid
  */
 router.get('/', isAuthenticated, async (req, res) => {
-    console.log(req.user);
-    res.status(200).send(Response.StandardResponse(
+    return res.status(200).send(StandardResponse(
         true,
         "User status.",
         req.user,
@@ -165,6 +162,7 @@ router.get('/', isAuthenticated, async (req, res) => {
  *                   example: "Validation error."
  *                 data:
  *                   type: "null"
+ *                   example: null
  *                 errors:
  *                   type: array
  *                   items:
@@ -196,10 +194,10 @@ router.get('/', isAuthenticated, async (req, res) => {
  *                   example: "Internal Server Error"
  * components:
  *   securitySchemes:
- *     bearerAuth:
+ *     cookieAuth:
  *       type: apiKey
- *       in: header
- *       name: Authorization
+ *       in: cookie
+ *       name: connect.sid
  */
 router.post('/update', isAuthenticated, [
     checkSchema({
@@ -211,12 +209,7 @@ router.post('/update', isAuthenticated, [
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).send(Response.StandardResponse(
-            false,
-            "Validation error.",
-            null,
-            errors.array()
-        ));
+        return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, null, errors);
     }
 
     const data = matchedData(req);
@@ -226,26 +219,167 @@ router.post('/update', isAuthenticated, [
         await userService.updateUser(data);
 
     } catch (error) {
-        console.log(error);
-        if (error.message === DatabaseErrors.EMAIL_ALREADY_EXISTS) {
-            return res.status(400).send(Response.StandardResponse(
-                false,
-                "Validation error.",
-                null,
-                error.message
-            ));
-        }
-        return res.status(500).send(Response.StandardResponse(
-            false,
-            "Internal server error.",
-            null,
-            error.message
-        ));
+        return await ErrorResponse(error, res);
     }
 
-    res.status(201).send(Response.StandardResponse(
+    res.status(200).send(StandardResponse(
         true,
         "User update successfully.",
+        null,
+        null
+    ));
+});
+
+/**
+ * @swagger
+ * /api/v1/auth/user/changepassword:
+ *   post:
+ *     summary: "Change user password"
+ *     description: "Allows an authenticated user to change their password by providing the old password and a new password."
+ *     tags:
+ *       - "User"
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       description: "User password change request."
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 format: password
+ *                 example: "oldPassword123"
+ *               newPassword:
+ *                 type: string
+ *                 format: password
+ *                 example: "NewStrongPassword123!"
+ *               confirmPassword:
+ *                 type: string
+ *                 format: password
+ *                 example: "NewStrongPassword123!"
+ *     responses:
+ *       200:
+ *         description: "Password changed successfully."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Password change successfully."
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: "null"
+ *                   example: null
+ * 
+ *       400:
+ *         description: "Validation error (e.g., incorrect old password, mismatched new passwords, or hash verification failure)"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Validation error."
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       msg:
+ *                         type: string
+ *                       param:
+ *                         type: string
+ *                       location:
+ *                         type: string
+ *       404:
+ *         description: "User not found"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "User not found."
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ * 
+ *       500:
+ *         description: "Internal server error"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error."
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ * 
+ * components:
+ *   securitySchemes:
+ *     cookieAuth:
+ *       type: apiKey
+ *       in: cookie
+ *       name: connect.sid
+ */
+router.post('/changepassword', isAuthenticated, [
+    checkSchema({
+        ...UserValidationSchema.oldPasswordValidation(),
+        ...UserValidationSchema.passwordValidation(),
+        ...UserValidationSchema.confirmPasswordValidation(),
+    })
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, null, errors);
+    }
+
+    const data = matchedData(req);
+    data.id = req.user.id
+
+    try {
+        await userService.changePassword(data);
+
+    } catch (error) {
+        return await ErrorResponse(error, res);
+    }
+
+    res.status(200).send(StandardResponse(
+        true,
+        "Password change successfully.",
         null,
         null
     ));

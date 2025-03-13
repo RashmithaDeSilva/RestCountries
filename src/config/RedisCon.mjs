@@ -14,7 +14,7 @@ const redisClient = createClient({
 
 // Handle errors properly
 redisClient.on("[ERROR] - ", (error) => {
-    console.log("Redis client error: ", error);
+    console.log("[INFO] - Redis client error: ", error);
     process.exit(1);
 });
 console.log("[INFO] - Redis Session Store Client Initialized");

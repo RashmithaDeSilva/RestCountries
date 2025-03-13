@@ -21,6 +21,17 @@ class UserDAO {
         }
     }
 
+    // Check id is exist
+    async checkId(id) {
+        try {
+            const [row] = await pool.query("SELECT id FROM users WHERE id = ?", [id]);
+            return row.length > 0;
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
     // Get user ID using email
     async getUserId(email) {
         try {
@@ -62,7 +73,7 @@ class UserDAO {
     }
 
     // Get password hash
-    async getHashPassword(email) {
+    async getHashPasswordByEmail(email) {
         try {
             // Check email is exist
             if (!await this.checkEmail(email)) {
@@ -70,6 +81,22 @@ class UserDAO {
             }
 
             const [row] = await pool.query(`SELECT password_hash FROM users WHERE email = ?`, [email]);
+            return row[0].password_hash;
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get password hash
+    async getHashPasswordById(id) {
+        try {
+            // Check id is exist
+            if (!await this.checkId(id)) {
+                throw new Error(DatabaseErrors.USER_NOT_FOUND);
+            }
+
+            const [row] = await pool.query(`SELECT password_hash FROM users WHERE id = ?`, [id]);
             return row[0].password_hash;
 
         } catch (error) {
@@ -129,13 +156,25 @@ class UserDAO {
                 throw new Error(DatabaseErrors.EMAIL_ALREADY_EXISTS);
             }
             
-            const [result] = await pool.query(`
+            await pool.query(`
                 UPDATE users 
                 SET first_name = ?, surname = ?, email = ?, contact_number = ?
                 WHERE id = ?
             `, [user.firstName, user.surname, user.email, user.contactNumber, user.id]);
 
-            return user.id;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Change password
+    async changePassword(id, hashPassword) {
+        try {
+            await pool.query(`
+                UPDATE users 
+                SET password_hash = ?
+                WHERE id = ?
+            `, [hashPassword, id]);
 
         } catch (error) {
             throw error;

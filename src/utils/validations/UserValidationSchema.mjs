@@ -179,31 +179,6 @@ class UserValidationSchema {
         };
     }
 
-    static newPasswordValidation() {
-        return {
-            new_password: {
-                notEmpty: {
-                    errorMessage: {
-                        error: "New password cannot be empty!"
-                    }
-                },
-                isString: {
-                    errorMessage: {
-                        error: "New password must be a string!"
-                    }
-                },
-                isLength: {
-                    options: {
-                        min: parseInt(USER_PASSWORD_MIN_CHARACTERS_SIZE, 12)
-                    },
-                    errorMessage: {
-                        error: `New password must be at least ${ USER_PASSWORD_MIN_CHARACTERS_SIZE || 12 } characters!`
-                    }
-                }
-            }
-        };
-    }
-
     static oldPasswordValidation() {
         return {
             old_password: {

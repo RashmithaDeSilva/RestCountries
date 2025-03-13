@@ -44,13 +44,10 @@ export default passport.use(
         } catch (error) {
             if (error.message === DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD 
                 || error.message === DatabaseErrors.INVALID_EMAIL_ADDRESS) {
-                return done(null, false, DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD);  // Expected errors
+                return done(new Error(DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD), false);  // Expected errors
             }
-
-            if (process.env.ENV === "DEV") {
-                throw error;
-            }
-            return done(null, false, CommonErrors.INTERNAL_SERVER_ERROR); // Unexpected errors (500)
+            return done(process.env.ENV === "DEV" ? 
+                error : new Error(CommonErrors.INTERNAL_SERVER_ERROR), false); // Unexpected errors (500)
         }
     })
 );
