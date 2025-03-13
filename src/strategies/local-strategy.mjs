@@ -3,10 +3,9 @@ import { Strategy } from "passport-local";
 import UserService from "../services/UserService.mjs";
 import DatabaseErrors from "../utils/errors/DatabaseErrors.mjs";
 import CommonErrors from "../utils/errors/CommonErrors.mjs";
-import ErrorLogService from "../services/ErrorLogService.mjs";
+import UserModel from "../models/UserModel.mjs";
 
 const userService = new UserService();
-const errorLogService = new ErrorLogService();
 
 // Take user object and store in session
 passport.serializeUser((user, done) => {
@@ -15,12 +14,20 @@ passport.serializeUser((user, done) => {
 });
 
 // Take data from session
-passport.deserializeUser((id, done) => {
+passport.deserializeUser(async (id, done) => {
     try {
         // console.log("deserializeUser");
-        const user = userService.findUser(id);
+        const user = await userService.findUser(id);
+        const responseUserModel = UserModel.getResponseUserModel(
+            user.firstName, 
+            user.surname,
+            user.email,
+            user.contactNumber,
+            user.verify,
+            user.id
+        );
         if (!user) throw new Error(DatabaseErrors.USER_NOT_FOUND);
-        done(null, user);
+        done(null, responseUserModel);
 
     } catch (error) {
         done(error, null);

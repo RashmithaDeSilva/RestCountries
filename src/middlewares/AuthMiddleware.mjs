@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const isAuthenticated = (req, res, next) => {
+const isAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) {
         return next();  // User is authenticated, proceed to the next middleware/route
     }
@@ -16,3 +16,5 @@ export const isAuthenticated = (req, res, next) => {
         { redirect: `/api/${ process.env.API_VERSION }/auth` }
     ));
 };
+
+export default isAuthenticated;

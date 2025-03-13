@@ -2,10 +2,12 @@ import { Router } from 'express';
 import dotenv from 'dotenv';
 import Response from '../utils/Response.mjs';
 import AuthRouter from './AuthRouter.mjs';
+import UserRouter from './UserRouter.mjs';
 
 dotenv.config();
 const router = Router();
 router.use('/auth/', AuthRouter);
+router.use('/auth/user', UserRouter);
 const API_VERSION = process.env.API_VERSION;
 
 /**
