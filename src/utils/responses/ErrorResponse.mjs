@@ -90,6 +90,14 @@ async function ErrorResponse(error, res, location = null, data = null) {
                 null
             ));
         
+        case ApiKeyErrors.API_KEY_CREATION_LIMIT_EXCEEDED:
+            return res.status(429).send(StandardResponse(
+                false,
+                error.message,
+                null,
+                "You have reached the maximum number of API keys allowed. Please delete an existing key or contact support."
+            ));
+        
         case HashErrors.HASHING_FAILED:
         case HashErrors.HASH_VERIFICATION_FAILED:
         case ApiKeyErrors.FAILED_TO_GENERATE_A_API_KEY:

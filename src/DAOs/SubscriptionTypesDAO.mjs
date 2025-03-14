@@ -37,6 +37,27 @@ class SubscriptionTypesDAO {
         }
     }
 
+    // Get subscription types
+    async getSubscriptionType(subId) {
+        try {
+            const [row] = await pool.query("SELECT * FROM subscription_types WHERE id = ?", [subId]);
+            if (row.length > 0) {
+                return new SubscriptionTypeModel(
+                    row[0].id,
+                    row[0].subscription_name,
+                    row[0].subscription_price,
+                    row[0].subscription_price_currency,
+                    row[0].api_request_limit,
+                    row[0].api_key_limit,
+                    row[0].description,
+                    row[0].function_description
+                );
+            }
+            return null;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default SubscriptionTypesDAO;

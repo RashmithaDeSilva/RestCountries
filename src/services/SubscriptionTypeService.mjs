@@ -18,6 +18,16 @@ class SubscriptionTypeService {
         }
     }
 
+    // Get subscription type
+    async getSubscriptionType(subId) {
+        try {
+            return await this.subscriptionTypesDAO.getSubscriptionType(subId);
+            
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default SubscriptionTypeService;

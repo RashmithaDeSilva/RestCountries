@@ -457,4 +457,175 @@ router.post('/generatenewkey', isAuthenticated, [
     )) : res.sendStatus(204);
 });
 
+/**
+ * @swagger
+ * /api/v1/auth/user/apikey/createnewkey:
+ *   post:
+ *     summary: "Create a new API key"
+ *     description: "Allows an authenticated user to create a new API key by providing a name."
+ *     tags:
+ *       - API Key
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       description: "Request to create a new API key."
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               api_key_name:
+ *                 type: string
+ *                 example: "myNewApiKey"
+ *     responses:
+ *       200:
+ *         description: "API key created successfully."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "API key created successfully."
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     userId:
+ *                       type: integer
+ *                       example: 123
+ *                     name:
+ *                       type: string
+ *                       example: "myNewApiKey"
+ *                     key:
+ *                       type: string
+ *                       example: "abcd1234efgh5678"
+ *                 errors:
+ *                   type: "null"
+ *                   example: null
+ *       204:
+ *         description: "No Content - API key created successfully with no additional response body."
+ *       400:
+ *         description: "Validation error."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Validation error."
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       msg:
+ *                         type: string
+ *                       param:
+ *                         type: string
+ *                       location:
+ *                         type: string
+ *       401:
+ *         description: "Unauthorized - User not authenticated."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Authentication failed"
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: object
+ *                   example: {"redirect":"/api/v1/auth"}
+ *       429:
+ *         description: "Too Many Requests - API key creation limit exceeded."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "API key creation limit exceeded"
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: "You have reached the maximum number of API keys allowed. Please delete an existing key or contact support."
+ *       500:
+ *         description: "Internal server error (e.g., failure to generate a new API key)."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error."
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ * components:
+ *   securitySchemes:
+ *     cookieAuth:
+ *       type: apiKey
+ *       in: cookie
+ *       name: connect.sid
+ */
+router.post('/createnewkey', isAuthenticated, [
+    checkSchema({
+        ...ApiKeyValidationSchema.apiKeyNameValidation(),
+    })
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, null, errors);
+    }
+
+    const data = matchedData(req);
+    let apiKeyModel;
+
+    try {
+        apiKeyModel = await apiKeyService.createApiKey(req.user.id, data.api_key_name);
+
+    } catch (error) {
+        return await ErrorResponse(error, res);
+    }
+
+    return ENV === "DEV" ? res.status(200).send(StandardResponse(
+        true,
+        "API key create successfully.",
+        apiKeyModel,
+        null
+    )) : res.sendStatus(204);
+});
+
 export default router;

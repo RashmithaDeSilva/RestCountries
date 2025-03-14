@@ -3,12 +3,16 @@ import ApiKeyModel from '../models/ApiKeyModel.mjs';
 import dotenv from 'dotenv';
 import generateApiKey from '../utils/ApiKeyGenerator.mjs';
 import ApiKeyErrors from '../utils/errors/ApiKeyErrors.mjs';
+import SubscriptionUserService from './SubscriptionUserService.mjs';
+import SubscriptionTypeService from './SubscriptionTypeService.mjs';
 
 dotenv.config();
 
 class ApiKeyService {
     constructor() {
         this.apiKeyDAO = new ApiKeyDAO();
+        this.subscriptionUserService = new SubscriptionUserService();
+        this.subscriptionTypeService = new SubscriptionTypeService();
     }
 
     // Generate new api key
@@ -42,14 +46,19 @@ class ApiKeyService {
     // Create api key
     async createApiKey(userId, keyName) {
         try {
-            // Get new api key
-            const apiKey = await this.generateApiKey();
+            if (await this.canUserCreateApiKey(userId)) {
+                // Get new api key
+                const apiKey = await this.generateApiKey();
 
-            // Create api key model
-            const apiKeyModel = new ApiKeyModel(userId, keyName, apiKey);
+                // Create api key model
+                const apiKeyModel = new ApiKeyModel(userId, keyName, apiKey);
 
-            // Save api key in database
-            return await this.apiKeyDAO.create(apiKeyModel);
+                // Save api key in database
+                await this.apiKeyDAO.create(apiKeyModel);
+
+                return await this.apiKeyDAO.getApiKeyByUserIdAndKeyName(userId, keyName);
+            }
+            throw new Error(ApiKeyErrors.API_KEY_CREATION_LIMIT_EXCEEDED);
 
         } catch (error) {
             throw error;
@@ -100,6 +109,22 @@ class ApiKeyService {
             throw error;
         }
     }
+
+    // Check if user can create more api key
+    async canUserCreateApiKey(userId) {
+        try {
+            const subscriptionId = await this.subscriptionUserService.getUserSubscription(userId);
+            const subscription = await this.subscriptionTypeService.getSubscriptionType(subscriptionId);
+            const usersCurrentApiKeyCount = await this.apiKeyDAO.getUsersCurrentApiKeyCount(userId);
+
+            return !(usersCurrentApiKeyCount >= subscription.apiKeyLimit)
+
+        } catch (error) {
+            return error;
+        }
+    }
+
+
 }
 
 export default ApiKeyService;
