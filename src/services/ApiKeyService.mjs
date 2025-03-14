@@ -45,10 +45,26 @@ class ApiKeyService {
     }
 
     // Get api key by user id
-    async getApiKeyByUserId(userId) {
+    async getApiKeysByUserId(userId) {
         try {
-            return await this.apiKeyDAO.getApiKeyByUserId(userId);
+            return await this.apiKeyDAO.getApiKeysByUserId(userId);
             
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Chnge api key name
+    async changeApiKeyByUserIdAndName(userId, data) {
+        try {
+            // Check old name or new name is exists
+            const oldNameExist = await this.apiKeyDAO.isKeyExistsByUserIdAndKeyName(userId, data.old_api_key_name);
+            const newNameExist = await this.apiKeyDAO.isKeyExistsByUserIdAndKeyName(userId, data.new_api_key_name);
+            if (!oldNameExist) throw new Error(ApiKeyErrors.API_KEY_NAME_YOU_TRY_TO_CHANGE_IS_NOT_EXIST);
+            if (newNameExist) throw new Error(ApiKeyErrors.NEW_API_KEY_NAME_YOU_ALREDY_USE);
+
+            await this.apiKeyDAO.changeApiKeyByUserIdAndName(userId, data.old_api_key_name, data.new_api_key_name);
+
         } catch (error) {
             throw error;
         }

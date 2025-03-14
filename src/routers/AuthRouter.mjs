@@ -9,6 +9,7 @@ import passport from 'passport';
 import CommonErrors from '../utils/errors/CommonErrors.mjs';
 import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
 import isAuthenticated from '../middlewares/AuthMiddleware.mjs';
+import { promisify } from 'util';
 
 dotenv.config();
 const router = Router();
@@ -373,15 +374,20 @@ router.post('/register', [
  *       in: cookie
  *       name: connect.sid 
  */
-router.post('/logout', isAuthenticated, (req, res) => {
-    req.logOut((error) => {
-        return error ? ErrorResponse(error, res) : res.status(200).send(StandardResponse(
+router.post('/logout', isAuthenticated, async (req, res) => {
+    const logOutAsync = promisify(req.logOut).bind(req);
+
+    try {
+        await logOutAsync();
+        return res.status(200).send(StandardResponse(
             true,
             "Successfully logged out",
             null,
             null
         ));
-    });
-})
+    } catch (error) {
+        return await ErrorResponse(error, res);
+    }
+});
 
 export default router;

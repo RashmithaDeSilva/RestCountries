@@ -3,6 +3,7 @@ import DatabaseErrors from "../errors/DatabaseErrors.mjs";
 import HashErrors from "../errors/HashErrors.mjs";
 import CommonErrors from "../errors/CommonErrors.mjs";
 import ErrorLogService from "../../services/ErrorLogService.mjs";
+import ApiKeyErrors from "../errors/ApiKeyErrors.mjs";
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -65,8 +66,25 @@ async function ErrorResponse(error, res, location = null, data = null) {
                 { redirect: `/api/${ process.env.API_VERSION }/auth` }
             ));
 
+        case ApiKeyErrors.API_KEY_NAME_YOU_TRY_TO_CHANGE_IS_NOT_EXIST:
+            return res.status(404).send(StandardResponse(
+                false,
+                error.message,
+                null,
+                null
+            ));
+        
+        case ApiKeyErrors.NEW_API_KEY_NAME_YOU_ALREDY_USE:
+            return res.status(409).send(StandardResponse(
+                false,
+                error.message,
+                null,
+                null
+            ));
+        
         case HashErrors.HASHING_FAILED:
         case HashErrors.HASH_VERIFICATION_FAILED:
+        case ApiKeyErrors.FAILED_TO_GENERATE_A_API_KEY:
             await logError(location, error, data);
             return res.status(500).send(StandardResponse(
                 false,

@@ -36,11 +36,11 @@ class UserValidationSchema {
                 },
                 isLength: {
                     options: {
-                        min: parseInt(USER_FIRST_NAME_MIN_CHARACTERS_SIZE || 5),
+                        min: parseInt(USER_FIRST_NAME_MIN_CHARACTERS_SIZE || 3),
                         max: parseInt(USER_FIRST_NAME_MAX_CHARACTERS_SIZE || 50)
                     },
                     errorMessage: {
-                        error: `First name must be between ${ USER_FIRST_NAME_MIN_CHARACTERS_SIZE || 5 } and ${ USER_FIRST_NAME_MAX_CHARACTERS_SIZE || 50 } characters!`
+                        error: `First name must be between ${ USER_FIRST_NAME_MIN_CHARACTERS_SIZE || 3 } and ${ USER_FIRST_NAME_MAX_CHARACTERS_SIZE || 50 } characters!`
                     }
                 }
             }
@@ -68,11 +68,11 @@ class UserValidationSchema {
                 },
                 isLength: {
                     options: {
-                        min: parseInt(USER_SURNAME_MIN_CHARACTERS_SIZE || 5),
+                        min: parseInt(USER_SURNAME_MIN_CHARACTERS_SIZE || 3),
                         max: parseInt(USER_SURNAME_MAX_CHARACTERS_SIZE || 50)
                     },
                     errorMessage: {
-                        error: `Surname must be between ${ USER_SURNAME_MIN_CHARACTERS_SIZE || 5 } and ${ USER_SURNAME_MAX_CHARACTERS_SIZE || 50 } characters!`
+                        error: `Surname must be between ${ USER_SURNAME_MIN_CHARACTERS_SIZE || 3 } and ${ USER_SURNAME_MAX_CHARACTERS_SIZE || 50 } characters!`
                     }
                 }
             }

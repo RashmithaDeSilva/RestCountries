@@ -242,12 +242,12 @@ router.post('/update', isAuthenticated, [
         return await ErrorResponse(error, res);
     }
 
-    res.status(200).send(StandardResponse(
+    return ENV === "DEV" ? res.status(200).send(StandardResponse(
         true,
         "User update successfully.",
         null,
         null
-    ));
+    )) : res.sendStatus(204);
 });
 
 /**
@@ -415,12 +415,12 @@ router.post('/changepassword', isAuthenticated, [
         return await ErrorResponse(error, res);
     }
 
-    res.status(200).send(StandardResponse(
+    return ENV === "DEV" ? res.status(200).send(StandardResponse(
         true,
         "Password change successfully.",
         null,
         null
-    ));
+    )) : res.sendStatus(204);
 });
 
 export default router;

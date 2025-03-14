@@ -1,5 +1,4 @@
 import { getDatabasePool } from '../config/SQLCon.mjs';
-import DatabaseErrors from '../utils/errors/DatabaseErrors.mjs';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -31,11 +30,31 @@ class ApiKeyDAO {
         return row.length > 0;
     }
 
+    // Check api key is exists
+    async isKeyExistsByUserIdAndKeyName(userId, name) {
+        const [row] = await pool.query(`SELECT key_name FROM api_keys WHERE user_id = ? AND key_name = ?`, [userId, name]);
+        return row.length > 0;
+    }
+
     // Get API key
-    async getApiKeyByUserId(userId) {
+    async getApiKeysByUserId(userId) {
         try {
             const [row] = await pool.query(`SELECT key, key_name FROM api_keys WHERE user_id = ?`, [userId]);
             return row.length === 0 ? null : row;
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Chnge api key name
+    async changeApiKeyByUserIdAndName(userId, oldName, newName) {
+        try {
+            await pool.query(`
+                UPDATE api_keys 
+                SET key_name = ?
+                WHERE user_id = ? AND key_name = ?
+            `, [newName, userId, oldName]);
 
         } catch (error) {
             throw error;
