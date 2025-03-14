@@ -208,6 +208,7 @@ router.get('/', isAuthenticated, (req, res) => {
  *                   example: "Internal server error"
  *                 data:
  *                   type: "null"
+ *                   example: null
  *                 errors:
  *                   type: string
  *                   example: "Internal Server Error"

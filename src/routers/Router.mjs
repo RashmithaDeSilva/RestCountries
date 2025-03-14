@@ -5,11 +5,13 @@ import AuthRouter from './AuthRouter.mjs';
 import UserRouter from './UserRouter.mjs';
 import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
 import CommonErrors from '../utils/errors/CommonErrors.mjs';
+import ApiKeyRouter from './ApiKeyRouter.mjs';
 
 dotenv.config();
 const router = Router();
 router.use('/auth/', AuthRouter);
 router.use('/auth/user', UserRouter);
+router.use('/auth/user/apikey', ApiKeyRouter);
 const API_VERSION = process.env.API_VERSION;
 
 /**

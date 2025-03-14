@@ -15,7 +15,7 @@ const apiKeyService = new ApiKeyService();
  *     summary: "Retrieve API Key"
  *     description: "Fetch the API key associated with the authenticated user."
  *     tags:
- *       - "User"
+ *       - "API Key"
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -72,6 +72,7 @@ const apiKeyService = new ApiKeyService();
  *                   example: "Internal server error"
  *                 data:
  *                   type: "null"
+ *                   example: null
  *                 errors:
  *                   type: string
  *                   example: null
@@ -80,9 +81,9 @@ const apiKeyService = new ApiKeyService();
  *     cookieAuth:
  *       type: apiKey
  *       in: cookie
- *       name: connect.sid  # Adjust based on your Passport.js session cookie name
+ *       name: connect.sid
  */
-router.get('/apikey', isAuthenticated, async (req, res) => {
+router.get('/', isAuthenticated, async (req, res) => {
     try {
         const key = await apiKeyService.getApiKeyByUserId(req.user.id);
         return res.status(200).send(StandardResponse(
