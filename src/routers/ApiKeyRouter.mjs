@@ -5,6 +5,7 @@ import isAuthenticated from '../middlewares/AuthMiddleware.mjs';
 import ApiKeyService from '../services/ApiKeyService.mjs';
 import { validationResult, matchedData, checkSchema } from 'express-validator';
 import ApiKeyValidationSchema from '../utils/validations/ApiKeyValidationSchema.mjs';
+import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
 
 dotenv.config();
 const router = Router();
@@ -103,7 +104,7 @@ router.get('/', isAuthenticated, async (req, res) => {
 
 /**
  * @swagger
- * /api/v1/auth/user/changename:
+ * /api/v1/auth/user/apikey/changename:
  *   post:
  *     summary: "Change API key name"
  *     description: "Allows an authenticated user to change the name of their API key."
@@ -271,7 +272,7 @@ router.post('/changename', isAuthenticated, [
     const data = matchedData(req);
 
     try {
-        await apiKeyService.changeApiKeyByUserIdAndName(req.user.id, data);
+        await apiKeyService.changeApiKeyNameByUserIdAndName(req.user.id, data);
         
     } catch (error) {
         return await ErrorResponse(error, res);
@@ -281,6 +282,177 @@ router.post('/changename', isAuthenticated, [
         true,
         "API key name change successfully.",
         null,
+        null
+    )) : res.sendStatus(204);
+});
+
+/**
+ * @swagger
+ * /api/v1/auth/user/apikey/generatenewkey:
+ *   post:
+ *     summary: "Generate a new API key"
+ *     description: "Allows an authenticated user to generate a new API key by providing a name for it."
+ *     tags:
+ *       - API Key
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       description: "Request to generate a new API key."
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               api_key_name:
+ *                 type: string
+ *                 example: "newApiKey"
+ *     responses:
+ *       200:
+ *         description: "API key generated successfully."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "API key generated successfully."
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     userId:
+ *                       type: integer
+ *                       example: 1
+ *                     keyName:
+ *                       type: string
+ *                       example: "Test key"
+ *                     key:
+ *                       type: string
+ *                       example: "1MUadML(QYneARm)VxZBQiVL%a!e*6DOe_cR#akFfOAsF7g$i0C=@5-1BxeEdUv5"
+ *                 errors:
+ *                   type: "null"
+ *                   example: null
+ *       404:
+ *         description: "API key name does not exist."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "API key name does not exist."
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: "null"
+ *                   example: null
+ *       204:
+ *         description: "No Content - API key generated successfully with no additional response body."
+ *       401:
+ *         description: "Unauthorized - User not authenticated."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Authentication failed"
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: object
+ *                   example: {"redirect":"/api/v1/auth"}
+ *       400:
+ *         description: "Validation error."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Validation error."
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       msg:
+ *                         type: string
+ *                       param:
+ *                         type: string
+ *                       location:
+ *                         type: string
+ *       500:
+ *         description: "Internal server error (e.g., failure to generate a new API key)."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error."
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ * components:
+ *   securitySchemes:
+ *     cookieAuth:
+ *       type: apiKey
+ *       in: cookie
+ *       name: connect.sid
+ */
+router.post('/generatenewkey', isAuthenticated, [
+    checkSchema({
+        ...ApiKeyValidationSchema.apiKeyNameValidation(),
+    })
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, null, errors);
+    }
+
+    const data = matchedData(req);
+    let apiKeyModel;
+
+    try {
+        apiKeyModel = await apiKeyService.generateNewApiKey(req.user.id, data);
+
+    } catch (error) {
+        return await ErrorResponse(error, res);
+    }
+
+    return ENV === "DEV" ? res.status(200).send(StandardResponse(
+        true,
+        "API key change successfully.",
+        apiKeyModel,
         null
     )) : res.sendStatus(204);
 });

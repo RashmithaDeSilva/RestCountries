@@ -14,7 +14,7 @@ class ApiKeyDAO {
             await pool.query(`
                 INSERT INTO api_keys (
                     key_name, 
-                    key, 
+                    api_key, 
                     user_id
                 ) values (?, ?, ?)
             `, [apiKeyModel.keyName, apiKeyModel.key, apiKeyModel.userId]);
@@ -26,7 +26,7 @@ class ApiKeyDAO {
 
     // Check api key is exists
     async isKeyExists(apiKey) {
-        const [row] = await pool.query(`SELECT key FROM api_keys WHERE key = ?`, [apiKey]);
+        const [row] = await pool.query(`SELECT api_key FROM api_keys WHERE api_key = ?`, [apiKey]);
         return row.length > 0;
     }
 
@@ -39,7 +39,7 @@ class ApiKeyDAO {
     // Get API key
     async getApiKeysByUserId(userId) {
         try {
-            const [row] = await pool.query(`SELECT key, key_name FROM api_keys WHERE user_id = ?`, [userId]);
+            const [row] = await pool.query(`SELECT api_key, key_name FROM api_keys WHERE user_id = ?`, [userId]);
             return row.length === 0 ? null : row;
 
         } catch (error) {
@@ -48,7 +48,7 @@ class ApiKeyDAO {
     }
 
     // Chnge api key name
-    async changeApiKeyByUserIdAndName(userId, oldName, newName) {
+    async changeApiKeyNameByUserIdAndName(userId, oldName, newName) {
         try {
             await pool.query(`
                 UPDATE api_keys 
@@ -59,6 +59,15 @@ class ApiKeyDAO {
         } catch (error) {
             throw error;
         }
+    }
+
+    // Chnge api key
+    async changeApiKeyByUserIdAndName(userId, apiKeyName, apiKey) {
+        await pool.query(`
+            UPDATE api_keys 
+            SET api_key = ?
+            WHERE user_id = ? AND key_name = ?
+        `, [apiKey, userId, apiKeyName]);
     }
 }
 

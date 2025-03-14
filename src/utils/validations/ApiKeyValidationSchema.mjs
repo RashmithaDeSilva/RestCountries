@@ -70,6 +70,38 @@ class ApiKeyValidationSchema {
             }
         };
     }
+
+    static apiKeyNameValidation() {
+        return {
+            api_key_name: {
+                notEmpty: {
+                    errorMessage: {
+                        error: "API key name can't be empty!"
+                    }
+                },
+                isString: {
+                    errorMessage: {
+                        error: "API key name must be a string!"
+                    }
+                },
+                matches: {
+                    options: [/^[A-Za-z]+(?: [A-Za-z]+)?$/], // Allows only letters with a single space
+                    errorMessage: {
+                        error: "API key name can only contain letters and a single space!"
+                    }
+                },
+                isLength: {
+                    options: {
+                        min: parseInt(API_KEY_NAME_MIN_CHARACTERS_SIZE || 5),
+                        max: parseInt(API_KEY_NAME_MAX_CHARACTERS_SIZE || 50)
+                    },
+                    errorMessage: {
+                        error: `API key name must be between ${ API_KEY_NAME_MIN_CHARACTERS_SIZE || 5 } and ${ API_KEY_NAME_MAX_CHARACTERS_SIZE || 50 } characters!`
+                    }
+                }
+            }
+        };
+    }
 }
 
 export default ApiKeyValidationSchema;

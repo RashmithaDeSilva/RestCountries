@@ -74,6 +74,14 @@ async function ErrorResponse(error, res, location = null, data = null) {
                 null
             ));
         
+        case ApiKeyErrors.API_KEY_NAME_IS_NOT_EXIST:
+            return res.status(404).send(StandardResponse(
+                false,
+                error.message,
+                null,
+                null
+            ));
+        
         case ApiKeyErrors.NEW_API_KEY_NAME_YOU_ALREDY_USE:
             return res.status(409).send(StandardResponse(
                 false,
