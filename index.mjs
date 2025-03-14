@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import { setupSwagger } from './swagger.mjs';
+import { setupSwagger } from './src/utils/swagger.mjs';
 import session from 'express-session';
 import router from './src/routers/Router.mjs';
 import passport from 'passport';

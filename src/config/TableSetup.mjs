@@ -13,6 +13,34 @@ async function setupDatabase() {
     }
 
     try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS subscription_types (
+                id ${ENV === "PROD" ? "INT AUTO_INCREMENT PRIMARY KEY" : "INTEGER PRIMARY KEY AUTOINCREMENT"},
+                subscription_name VARCHAR(50) NOT NULL,
+                subscription_price ${ENV === "PROD" ? "INT" : "INTEGER"} NOT NULL,
+                subscription_price_currency VARCHAR(50) NOT NULL,
+                api_request_limit ${ENV === "PROD" ? "INT" : "INTEGER"} NOT NULL,
+                description TEXT,
+                function_description TEXT
+            );
+        `);        
+        console.log("[INFO] - Subscription Types table created or already exists");
+
+        await pool.query(`
+            INSERT INTO subscription_types 
+                (subscription_name, subscription_price, subscription_price_currency, api_request_limit, description, function_description)
+            SELECT 'Free', 0, 'USD', 1000, 'Basic subscription', 'Manages basic user access'
+            WHERE NOT EXISTS (SELECT 1 FROM subscription_types WHERE subscription_name = 'Free')
+            UNION ALL
+            SELECT 'Plus', 10, 'USD', 1000000, 'Premium subscription', 'Provides premium features'
+            WHERE NOT EXISTS (SELECT 1 FROM subscription_types WHERE subscription_name = 'Plus')
+            UNION ALL
+            SELECT 'Pro', 25, 'USD', -1, 'Enterprise subscription', 'Enterprise-level access and controls'
+            WHERE NOT EXISTS (SELECT 1 FROM subscription_types WHERE subscription_name = 'Pro');
+
+        `);
+        console.log("[INFO] - Subscription Types created or already exists");
+
         await pool.query(
             `CREATE TABLE IF NOT EXISTS error_logs (
                 id ${ ENV === "PROD" ? "INT PRIMARY KEY AUTO_INCREMENT" : "INTEGER PRIMARY KEY AUTOINCREMENT" },
