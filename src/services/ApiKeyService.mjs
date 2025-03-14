@@ -94,9 +94,9 @@ class ApiKeyService {
     // Generate new key
     async generateNewApiKey(userId, data) {
         try {
-            // Check api name is exists
+            // Check api key name is exists
             const apiNameExist = await this.apiKeyDAO.isKeyExistsByUserIdAndKeyName(userId, data.api_key_name);
-            if (!apiNameExist) throw new Error(ApiKeyErrors.API_KEY_NAME_IS_NOT_EXIST);
+            if (!apiNameExist) throw new Error(ApiKeyErrors.API_KEY_NAME_NOT_FOUND);
 
             // Get new api key
             const apiKey = await this.generateApiKey();
@@ -120,11 +120,23 @@ class ApiKeyService {
             return !(usersCurrentApiKeyCount >= subscription.apiKeyLimit)
 
         } catch (error) {
-            return error;
+            throw error;
         }
     }
 
+    // Delete api key
+    async deleteApiKeyByUserIdAndKeyName(userId, data) {
+        try {
+            // Check api key name is exists
+            const apiKeyNameExist = await this.apiKeyDAO.isKeyExistsByUserIdAndKeyName(userId, data.api_key_name);
+            if (!apiKeyNameExist) throw new Error(ApiKeyErrors.API_KEY_NAME_NOT_FOUND);
 
+            await this.apiKeyDAO.deleteApiKeyByUserIdAndKeyName(userId, data.api_key_name);
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default ApiKeyService;

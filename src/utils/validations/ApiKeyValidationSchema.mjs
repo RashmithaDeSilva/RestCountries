@@ -20,12 +20,6 @@ class ApiKeyValidationSchema {
                         error: "Old API key name must be a string!"
                     }
                 },
-                matches: {
-                    options: [/^[A-Za-z]+(?: [A-Za-z]+)?$/], // Allows only letters with a single space
-                    errorMessage: {
-                        error: "Old API key name can only contain letters and a single space!"
-                    }
-                },
                 isLength: {
                     options: {
                         min: parseInt(API_KEY_NAME_MIN_CHARACTERS_SIZE || 5),
@@ -52,12 +46,6 @@ class ApiKeyValidationSchema {
                         error: "New API key name must be a string!"
                     }
                 },
-                matches: {
-                    options: [/^[A-Za-z]+(?: [A-Za-z]+)?$/], // Allows only letters with a single space
-                    errorMessage: {
-                        error: "New API key name can only contain letters and a single space!"
-                    }
-                },
                 isLength: {
                     options: {
                         min: parseInt(API_KEY_NAME_MIN_CHARACTERS_SIZE || 5),
@@ -82,12 +70,6 @@ class ApiKeyValidationSchema {
                 isString: {
                     errorMessage: {
                         error: "API key name must be a string!"
-                    }
-                },
-                matches: {
-                    options: [/^[A-Za-z]+(?: [A-Za-z]+)?$/], // Allows only letters with a single space
-                    errorMessage: {
-                        error: "API key name can only contain letters and a single space!"
                     }
                 },
                 isLength: {

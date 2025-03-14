@@ -27,14 +27,24 @@ class ApiKeyDAO {
 
     // Check api key is exists
     async isKeyExists(apiKey) {
-        const [row] = await pool.query(`SELECT api_key FROM api_keys WHERE api_key = ?`, [apiKey]);
-        return row.length > 0;
+        try {
+            const [row] = await pool.query(`SELECT api_key FROM api_keys WHERE api_key = ?`, [apiKey]);
+            return row.length > 0;
+
+        } catch (error) {
+            throw error;
+        }
     }
 
     // Check api key is exists
     async isKeyExistsByUserIdAndKeyName(userId, name) {
-        const [row] = await pool.query(`SELECT key_name FROM api_keys WHERE user_id = ? AND key_name = ?`, [userId, name]);
-        return row.length > 0;
+        try {
+            const [row] = await pool.query(`SELECT key_name FROM api_keys WHERE user_id = ? AND key_name = ?`, [userId, name]);
+            return row.length > 0;
+            
+        } catch (error) {
+            throw error;
+        }
     }
 
     // Get API keys by user id
@@ -75,11 +85,16 @@ class ApiKeyDAO {
 
     // Chnge api key
     async changeApiKeyByUserIdAndName(userId, apiKeyName, apiKey) {
-        await pool.query(`
-            UPDATE api_keys 
-            SET api_key = ?
-            WHERE user_id = ? AND key_name = ?
-        `, [apiKey, userId, apiKeyName]);
+        try {
+            await pool.query(`
+                UPDATE api_keys 
+                SET api_key = ?
+                WHERE user_id = ? AND key_name = ?
+            `, [apiKey, userId, apiKeyName]);
+            
+        } catch (error) {
+            throw error;
+        }
     }
 
     // Get user's current api key count
@@ -93,7 +108,15 @@ class ApiKeyDAO {
         }
     }
 
-    
+    // Delete api key
+    async deleteApiKeyByUserIdAndKeyName(userId, name) {
+        try {
+            await pool.query(`DELETE FROM api_keys WHERE user_id = ? AND key_name = ?`, [userId, name]);
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default ApiKeyDAO;

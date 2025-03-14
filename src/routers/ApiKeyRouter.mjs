@@ -6,6 +6,7 @@ import ApiKeyService from '../services/ApiKeyService.mjs';
 import { validationResult, matchedData, checkSchema } from 'express-validator';
 import ApiKeyValidationSchema from '../utils/validations/ApiKeyValidationSchema.mjs';
 import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
+import CommonErrors from '../utils/errors/CommonErrors.mjs';
 
 dotenv.config();
 const router = Router();
@@ -206,7 +207,7 @@ router.get('/', isAuthenticated, async (req, res) => {
  *                   example: false
  *                 message:
  *                   type: string
- *                   example: "API key name you tried to change does not exist."
+ *                   example: "API key not found"
  *                 data:
  *                   type: "null"
  *                   example: null
@@ -348,12 +349,12 @@ router.patch('/changename', isAuthenticated, [
  *                   example: false
  *                 message:
  *                   type: string
- *                   example: "API key name does not exist."
+ *                   example: "API key not found"
  *                 data:
  *                   type: "null"
  *                   example: null
  *                 errors:
- *                   type: "null"
+ *                   type: string
  *                   example: null
  *       204:
  *         description: "No Content - API key generated successfully with no additional response body."
@@ -624,6 +625,167 @@ router.post('/createnewkey', isAuthenticated, [
         true,
         "API key create successfully.",
         apiKeyModel,
+        null
+    )) : res.sendStatus(204);
+});
+
+/**
+ * @swagger
+ * /api/v1/auth/user/apikey/delete:
+ *   delete:
+ *     summary: "Delete an API key"
+ *     description: "Allows an authenticated user to delete an API key by its name."
+ *     tags:
+ *       - API Key
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       description: "Request to delete an API key."
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               api_key_name:
+ *                 type: string
+ *                 example: "myOldApiKey"
+ *     responses:
+ *       200:
+ *         description: "API key deleted successfully."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "API key deleted successfully."
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: "null"
+ *                   example: null
+ *       204:
+ *         description: "No Content - API key deleted successfully with no additional response body."
+ *       400:
+ *         description: "Validation error."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Validation error."
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       msg:
+ *                         type: string
+ *                       param:
+ *                         type: string
+ *                       location:
+ *                         type: string
+ *       401:
+ *         description: "Unauthorized - User not authenticated."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Authentication failed"
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: object
+ *                   example: {"redirect":"/api/v1/auth"}
+ *       404:
+ *         description: "API key name does not exist."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "API key not found"
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ *       500:
+ *         description: "Internal server error (e.g., failure to generate a new API key)."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error."
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ * components:
+ *   securitySchemes:
+ *     cookieAuth:
+ *       type: apiKey
+ *       in: cookie
+ *       name: connect.sid
+ */
+router.delete('/delete', isAuthenticated, [
+    checkSchema({
+        ...ApiKeyValidationSchema.apiKeyNameValidation(),
+    })
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, null, errors);
+    }
+
+    const data = matchedData(req);
+
+    try {
+        await apiKeyService.deleteApiKeyByUserIdAndKeyName(req.user.id, data);
+
+    } catch (error) {
+        return await ErrorResponse(error, res);
+    }
+
+    return ENV === "DEV" ? res.status(200).send(StandardResponse(
+        true,
+        "API key delete successfully.",
+        null,
         null
     )) : res.sendStatus(204);
 });
