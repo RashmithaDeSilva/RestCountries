@@ -105,7 +105,7 @@ router.get('/', isAuthenticated, async (req, res) => {
 /**
  * @swagger
  * /api/v1/auth/user/apikey/changename:
- *   post:
+ *   patch:
  *     summary: "Change API key name"
  *     description: "Allows an authenticated user to change the name of their API key."
  *     tags:
@@ -258,7 +258,7 @@ router.get('/', isAuthenticated, async (req, res) => {
  *       in: cookie
  *       name: connect.sid
  */
-router.post('/changename', isAuthenticated, [
+router.patch('/changename', isAuthenticated, [
     checkSchema({
         ...ApiKeyValidationSchema.oldApiKeyNameValidation(),
         ...ApiKeyValidationSchema.newApiKeyNameValidation(),
@@ -289,7 +289,7 @@ router.post('/changename', isAuthenticated, [
 /**
  * @swagger
  * /api/v1/auth/user/apikey/generatenewkey:
- *   post:
+ *   patch:
  *     summary: "Generate a new API key"
  *     description: "Allows an authenticated user to generate a new API key by providing a name for it."
  *     tags:
@@ -429,7 +429,7 @@ router.post('/changename', isAuthenticated, [
  *       in: cookie
  *       name: connect.sid
  */
-router.post('/generatenewkey', isAuthenticated, [
+router.patch('/generatenewkey', isAuthenticated, [
     checkSchema({
         ...ApiKeyValidationSchema.apiKeyNameValidation(),
     })

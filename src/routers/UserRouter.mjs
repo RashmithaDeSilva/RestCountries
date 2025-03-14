@@ -100,7 +100,7 @@ router.get('/', isAuthenticated, (req, res) => {
 /**
  * @swagger
  * /api/v1/auth/user/update:
- *   post:
+ *   put:
  *     summary: "Update user information"
  *     description: "This endpoint allows the authenticated user to update their personal information, such as first name, surname, email, and contact number."
  *     tags:
@@ -219,7 +219,7 @@ router.get('/', isAuthenticated, (req, res) => {
  *       in: cookie
  *       name: connect.sid
  */
-router.post('/update', isAuthenticated, [
+router.put('/update', isAuthenticated, [
     checkSchema({
         ...UserValidationSchema.firstNameValidation(),
         ...UserValidationSchema.surnameValidation(),
@@ -253,7 +253,7 @@ router.post('/update', isAuthenticated, [
 /**
  * @swagger
  * /api/v1/auth/user/changepassword:
- *   post:
+ *   patch:
  *     summary: "Change user password"
  *     description: "Allows an authenticated user to change their password by providing the old password and a new password."
  *     tags:
@@ -393,7 +393,7 @@ router.post('/update', isAuthenticated, [
  *       in: cookie
  *       name: connect.sid
  */
-router.post('/changepassword', isAuthenticated, [
+router.patch('/changepassword', isAuthenticated, [
     checkSchema({
         ...UserValidationSchema.oldPasswordValidation(),
         ...UserValidationSchema.passwordValidation(),
