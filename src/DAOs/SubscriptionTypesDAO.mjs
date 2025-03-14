@@ -1,0 +1,42 @@
+import { getDatabasePool } from '../config/SQLCon.mjs';
+import SubscriptionTypeModel from '../models/SubscriptionTypeModel.mjs';
+import dotenv from 'dotenv';
+
+dotenv.config();
+const pool = await getDatabasePool();
+
+class SubscriptionTypesDAO {
+    constructor () {
+    } 
+
+    // Get all subscription types
+    async getAllSubscriptionTypes() {
+        try {
+            const [row] = await pool.query("SELECT * FROM subscription_types");
+            if (row.length > 0) {
+                const subscriptionTypeModelSet = [];
+
+                for (i=0; i<row.length; i++) {
+                    subscriptionTypeModelSet.push(new SubscriptionTypeModel(
+                        row[i].id,
+                        row[i].subscription_name,
+                        row[i].subscription_price,
+                        row[i].subscription_price_currency,
+                        row[i].api_request_limit,
+                        row[i].api_key_limit,
+                        row[i].description,
+                        row[i].function_description
+                    ));
+                }
+
+                return subscriptionTypeModelSet;
+            }
+            return null;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+}
+
+export default SubscriptionTypesDAO;
