@@ -11,7 +11,7 @@ class UserDAO {
     }
 
     // Check email is exist
-    async checkEmail(email) {
+    async checkEmailIsExist(email) {
         try {
             const [row] = await pool.query("SELECT email FROM users WHERE email = ?", [email]);
             return row.length > 0;
@@ -22,7 +22,7 @@ class UserDAO {
     }
 
     // Check id is exist
-    async checkId(id) {
+    async checkIdIsExist(id) {
         try {
             const [row] = await pool.query("SELECT id FROM users WHERE id = ?", [id]);
             return row.length > 0;
@@ -33,7 +33,7 @@ class UserDAO {
     }
 
     // Get user ID using email
-    async getUserId(email) {
+    async getUserIdByEmail(email) {
         try {
             const [row] = await pool.query("SELECT id FROM users WHERE email = ?", [email]);
             if (row.length > 0) {
@@ -49,9 +49,7 @@ class UserDAO {
     async create(user) {
         try {
             // Check email is exist
-            if (await this.checkEmail(user.email)) {
-                throw new Error(DatabaseErrors.EMAIL_ALREADY_EXISTS);
-            }
+            if (await this.checkEmailIsExist(user.email)) throw new Error(DatabaseErrors.EMAIL_ALREADY_EXISTS);
             
             const [result] = await pool.query(`
                 INSERT INTO users (
@@ -64,7 +62,7 @@ class UserDAO {
             `, [user.firstName, user.surname, user.email, user.contactNumber, user.passwordHash]);
 
             const userId = process.env.ENV === "PROD" ? 
-            result.insertId : await this.getUserId(user.email);
+            result.insertId : await this.getUserIdByEmail(user.email);
             return userId;
 
         } catch (error) {
@@ -76,9 +74,7 @@ class UserDAO {
     async getHashPasswordByEmail(email) {
         try {
             // Check email is exist
-            if (!await this.checkEmail(email)) {
-                throw new Error(DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD);
-            }
+            if (!await this.checkEmailIsExist(email)) throw new Error(DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD);
 
             const [row] = await pool.query(`SELECT password_hash FROM users WHERE email = ?`, [email]);
             return row[0].password_hash;
@@ -92,9 +88,7 @@ class UserDAO {
     async getHashPasswordById(id) {
         try {
             // Check id is exist
-            if (!await this.checkId(id)) {
-                throw new Error(DatabaseErrors.USER_NOT_FOUND);
-            }
+            if (!await this.checkIdIsExist(id)) throw new Error(DatabaseErrors.USER_NOT_FOUND);
 
             const [row] = await pool.query(`SELECT password_hash FROM users WHERE id = ?`, [id]);
             return row[0].password_hash;
@@ -105,12 +99,10 @@ class UserDAO {
     }
 
     // Get user using email
-    async getUser(email) {
+    async getUserByEmail(email) {
         try {
             // Check email is exist
-            if (!await this.checkEmail(email)) {
-                throw new Error(DatabaseErrors.INVALID_EMAIL_ADDRESS);
-            }
+            if (!await this.checkEmailIsExist(email)) throw new Error(DatabaseErrors.INVALID_EMAIL_ADDRESS);
             
             const [row] = await pool.query(`SELECT * FROM users WHERE email = ?`, [email]);
             return new UserModel(
@@ -129,7 +121,7 @@ class UserDAO {
     }
 
     // Get user using id
-    async findUser(id) {
+    async getUserById(id) {
         try {
             const [row] = await pool.query(`SELECT * FROM users WHERE id = ?`, [id]);
             return row.length === 0 ? null : new UserModel(
@@ -151,10 +143,8 @@ class UserDAO {
     async update(user) {
         try {
             // Check email is exist
-            const id = await this.getUserId(user.email);
-            if (id !== null && id !== user.id) {
-                throw new Error(DatabaseErrors.EMAIL_ALREADY_EXISTS);
-            }
+            const id = await this.getUserIdByEmail(user.email);
+            if (id !== null && id !== user.id) throw new Error(DatabaseErrors.EMAIL_ALREADY_EXISTS);
             
             await pool.query(`
                 UPDATE users 

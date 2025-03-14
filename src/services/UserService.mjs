@@ -4,16 +4,20 @@ import { generateHash, verify } from '../utils/security/Hash.mjs';
 import DatabaseErrors from '../utils/errors/DatabaseErrors.mjs';
 import dotenv from 'dotenv';
 import HashErrors from '../utils/errors/HashErrors.mjs';
+import ApiKeyService from './ApiKeyService.mjs';
+import ApiKeyErrors from '../utils/errors/ApiKeyErrors.mjs';
 
 dotenv.config();
 
 class UserService {
     constructor() {
         this.userDAO = new UserDAO();
+        this.apiKeyService = new ApiKeyService();
     }
 
     // Create user
     async createUser(data) {
+        let userId;
         try {
             // Generate hash
             const hashPassword = await generateHash(data.password);
@@ -28,9 +32,15 @@ class UserService {
             );
 
             // Save user in database
-            return await this.userDAO.create(user);
+            userId = await this.userDAO.create(user);
+
+            // Create api key
+            if (userId) await this.apiKeyService.createApiKey(userId, "API KEY");
+
+            return userId;
 
         } catch (error) {
+            if (error.message === ApiKeyErrors.FAILED_TO_GENERATE_A_API_KEY) return userId;
             throw error;
         }
     }
@@ -74,7 +84,7 @@ class UserService {
     // Authenticat user
     async authenticateUser(email, password) {
         try {
-            const user = await this.userDAO.getUser(email);
+            const user = await this.userDAO.getUserByEmail(email);
             const passwordVerify = await verify(user.passwordHash, password);
             if (!passwordVerify) throw new Error(DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD);
             return user;
@@ -84,9 +94,10 @@ class UserService {
         }
     }
 
-    async findUser(id) {
+    // Get user by user id
+    async getUserById(id) {
         try {
-            const user = await this.userDAO.findUser(id);
+            const user = await this.userDAO.getUserById(id);
             if (!user) throw new Error(DatabaseErrors.USER_NOT_FOUND);
             return user;
             

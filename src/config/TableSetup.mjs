@@ -38,6 +38,17 @@ async function setupDatabase() {
         );
         console.log("[INFO] - Users table created or already exists");
 
+        await pool.query(
+            `CREATE TABLE IF NOT EXISTS api_keys (
+                id ${ENV === "PROD" ? "INT PRIMARY KEY AUTO_INCREMENT" : "INTEGER PRIMARY KEY AUTOINCREMENT"},
+                key_name VARCHAR(50) NOT NULL,
+                key VARCHAR(255) UNIQUE NOT NULL,
+                user_id ${ENV === "PROD" ? "INT" : "INTEGER"},
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );`
+        );
+        console.log("[INFO] - API Keys table created or already exists");
+
         if (process.env.ENV === 'PROD') {
             await pool.end();
         }
