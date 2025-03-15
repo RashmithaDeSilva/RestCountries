@@ -11,7 +11,7 @@ import redisSessionStore from './src/config/RedisCon.mjs';
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
-const API_VERSION = process.env.API_VERSION || 'v0';
+const API_VERSION = process.env.API_VERSION || 'v1';
 const ENV = process.env.ENV || 'DEV';
 
 // Swagger setup
@@ -22,11 +22,11 @@ if (ENV === "DEV") {
 // Session setup
 app.use(session({
     store: redisSessionStore,
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'wVI7efbx+CV43xplx4!H$a&lUAX2H6jJ)Gb&0NJy$%)V%TNAPaUF=5yHeZ6Sz!I@',
     saveUninitialized: false, // recommended: only save session when data exists
     resave: false, // required: force lightweight session keep alive (touch)
     cookie: {
-        maxAge: Number(process.env.COOKIE_EX_TIME),
+        maxAge: Number(process.env.COOKIE_EX_TIME || 86400),
     },
 }));
 

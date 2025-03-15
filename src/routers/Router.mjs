@@ -14,7 +14,7 @@ router.use('/auth/', UserAuthRouter);
 router.use('/auth/user', UserRouter);
 router.use('/auth/user/apikey', ApiKeyRouter);
 router.use('/auth/restcountry', RestCountryRouter);
-const API_VERSION = process.env.API_VERSION;
+const API_VERSION = process.env.API_VERSION || 'v1';
 
 /**
  * @swagger

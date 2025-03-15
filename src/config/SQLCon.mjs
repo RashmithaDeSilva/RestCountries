@@ -3,6 +3,10 @@ import mysql2 from "mysql2/promise";
 import dotenv from "dotenv";
 
 dotenv.config();
+const MYSQL_DB_HOST = process.env.MYSQL_DB_HOST || "localhost";
+const MYSQL_DB_USER = process.env.MYSQL_DB_USER || "root";
+const MYSQL_DB_PASSWORD = process.env.MYSQL_DB_PASSWORD || "12345";
+const DB_NAME = process.env.DB_NAME || "cw1";
 
 let pool;
 
@@ -10,20 +14,20 @@ async function initializeDatabase() {
     try {
         if (process.env.ENV === "PROD") {
             const connection = await mysql2.createConnection({
-                host: process.env.MYSQL_DB_HOST || "localhost",
-                user: process.env.MYSQL_DB_USER || "root",
-                password: process.env.MYSQL_DB_PASSWORD || "12345",
+                host: MYSQL_DB_HOST,
+                user: MYSQL_DB_USER,
+                password: MYSQL_DB_PASSWORD
             });
 
-            await connection.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME || "cw1"}`);
+            await connection.query(`CREATE DATABASE IF NOT EXISTS ${ DB_NAME }`);
             await connection.end();
             console.log("[INFO] - Database ensured");
 
             pool = mysql2.createPool({
-                host: process.env.MYSQL_DB_HOST || "localhost",
-                user: process.env.MYSQL_DB_USER || "root",
-                password: process.env.MYSQL_DB_PASSWORD || "12345",
-                database: process.env.DB_NAME || "cw1",
+                host: MYSQL_DB_HOST,
+                user: MYSQL_DB_USER,
+                password: MYSQL_DB_PASSWORD,
+                database: DB_NAME,
                 waitForConnections: true,
                 connectionLimit: 10,
                 queueLimit: 0,
@@ -32,7 +36,7 @@ async function initializeDatabase() {
 
         } else if (process.env.ENV === "DEV") {
             sqlite3.verbose();
-            pool = new sqlite3.Database(`./${ process.env.DB_NAME || "dev" }.db`, (err) => {
+            pool = new sqlite3.Database(`./${ DB_NAME }.db`, (err) => {
                 if (err) {
                     console.error("[ERROR] - SQLite Connection Failed...", err);
                     process.exit(1);

@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 const ENV = process.env.ENV || "PROD";
+const API_VERSION = process.env.API_VERSION || 'v1';
 const errorLogService = new ErrorLogService();
 
 // Log error in database
@@ -38,7 +39,7 @@ async function ErrorResponse(error, res, location = null, data = null) {
                     false,
                     error.message,
                     null,
-                    { redirect: `/api/${ process.env.API_VERSION }/auth` }
+                    { redirect: `/api/${ API_VERSION }/auth` }
                 ));
     
             case DatabaseErrors.EMAIL_ALREADY_EXISTS:
@@ -59,7 +60,7 @@ async function ErrorResponse(error, res, location = null, data = null) {
                     false,
                     error.message,
                     null,
-                    { redirect: `/api/${ process.env.API_VERSION }/auth` }
+                    { redirect: `/api/${ API_VERSION }/auth` }
                 ));
     
             case ApiKeyErrors.API_KEY_NAME_YOU_TRY_TO_CHANGE_IS_NOT_EXIST:

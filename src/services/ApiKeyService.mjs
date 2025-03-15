@@ -20,7 +20,7 @@ class ApiKeyService {
         try {
             let apiKey;
             let attempts = 0;
-            const maxAttempts = Number(process.env.API_KEY_GENERATE_MAX_ATTEMPTS);
+            const maxAttempts = Number(process.env.API_KEY_GENERATE_MAX_ATTEMPTS || 5);
 
             do {
                 // Generate api key

@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 
 dotenv.config();
-const API_KEY_NAME_MIN_CHARACTERS_SIZE = process.env.API_KEY_NAME_MIN_CHARACTERS_SIZE;
-const API_KEY_NAME_MAX_CHARACTERS_SIZE = process.env.API_KEY_NAME_MAX_CHARACTERS_SIZE;
+const API_KEY_NAME_MIN_CHARACTERS_SIZE = process.env.API_KEY_NAME_MIN_CHARACTERS_SIZE || 5;
+const API_KEY_NAME_MAX_CHARACTERS_SIZE = process.env.API_KEY_NAME_MAX_CHARACTERS_SIZE || 50;
 
 class ApiKeyValidationSchema {
     constructor() {}
@@ -22,11 +22,11 @@ class ApiKeyValidationSchema {
                 },
                 isLength: {
                     options: {
-                        min: parseInt(API_KEY_NAME_MIN_CHARACTERS_SIZE || 5),
-                        max: parseInt(API_KEY_NAME_MAX_CHARACTERS_SIZE || 50)
+                        min: parseInt(API_KEY_NAME_MIN_CHARACTERS_SIZE),
+                        max: parseInt(API_KEY_NAME_MAX_CHARACTERS_SIZE)
                     },
                     errorMessage: {
-                        error: `Old API key name must be between ${ API_KEY_NAME_MIN_CHARACTERS_SIZE || 5 } and ${ API_KEY_NAME_MAX_CHARACTERS_SIZE || 50 } characters!`
+                        error: `Old API key name must be between ${ API_KEY_NAME_MIN_CHARACTERS_SIZE } and ${ API_KEY_NAME_MAX_CHARACTERS_SIZE } characters!`
                     }
                 }
             }
@@ -48,11 +48,11 @@ class ApiKeyValidationSchema {
                 },
                 isLength: {
                     options: {
-                        min: parseInt(API_KEY_NAME_MIN_CHARACTERS_SIZE || 5),
-                        max: parseInt(API_KEY_NAME_MAX_CHARACTERS_SIZE || 50)
+                        min: parseInt(API_KEY_NAME_MIN_CHARACTERS_SIZE),
+                        max: parseInt(API_KEY_NAME_MAX_CHARACTERS_SIZE)
                     },
                     errorMessage: {
-                        error: `New API key name must be between ${ API_KEY_NAME_MIN_CHARACTERS_SIZE || 5 } and ${ API_KEY_NAME_MAX_CHARACTERS_SIZE || 50 } characters!`
+                        error: `New API key name must be between ${ API_KEY_NAME_MIN_CHARACTERS_SIZE } and ${ API_KEY_NAME_MAX_CHARACTERS_SIZE } characters!`
                     }
                 }
             }
@@ -74,11 +74,11 @@ class ApiKeyValidationSchema {
                 },
                 isLength: {
                     options: {
-                        min: parseInt(API_KEY_NAME_MIN_CHARACTERS_SIZE || 5),
-                        max: parseInt(API_KEY_NAME_MAX_CHARACTERS_SIZE || 50)
+                        min: parseInt(API_KEY_NAME_MIN_CHARACTERS_SIZE),
+                        max: parseInt(API_KEY_NAME_MAX_CHARACTERS_SIZE)
                     },
                     errorMessage: {
-                        error: `API key name must be between ${ API_KEY_NAME_MIN_CHARACTERS_SIZE || 5 } and ${ API_KEY_NAME_MAX_CHARACTERS_SIZE || 50 } characters!`
+                        error: `API key name must be between ${ API_KEY_NAME_MIN_CHARACTERS_SIZE } and ${ API_KEY_NAME_MAX_CHARACTERS_SIZE } characters!`
                     }
                 }
             }

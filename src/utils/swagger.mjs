@@ -20,5 +20,5 @@ const options = {
 const swaggerSpec = swaggerJSDoc(options);
 
 export function setupSwagger(app) {
-    app.use(`/api/${ process.env.API_VERSION || 'v0' }/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    app.use(`/api/${ process.env.API_VERSION || 'v1' }/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }

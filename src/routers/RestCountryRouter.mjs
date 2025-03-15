@@ -8,13 +8,27 @@ import isAuthenticated from '../middlewares/ApiKeyAuthMiddleware.mjs';
 dotenv.config();
 const router = Router();
 
-router.get('/', isAuthenticated, (req, res) => {
-    return res.status(200).send(StandardResponse(
-        true,
-        "User status.",
-        req.user,
-        null
-    ));
+router.get('/', isAuthenticated, async (req, res) => {
+    try {
+        const response = await fetch('https://restcountries.com/v3.1/all');
+        const data = await response.json();
+
+        return res.status(200).send(StandardResponse(
+            true,
+            "Rest countries all",
+            data,
+            null
+        ));
+        
+    } catch (error) {
+        console.error('Error fetching countries:', error);
+        return res.status(500).send(StandardResponse(
+            false,
+            "Failed to fetch country data",
+            null,
+            error.message
+        ));
+    }
 });
 
 export default router;
