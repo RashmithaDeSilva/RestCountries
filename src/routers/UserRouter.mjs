@@ -239,7 +239,7 @@ router.put('/update', isAuthenticated, [
         await userService.updateUser(data);
 
     } catch (error) {
-        return await ErrorResponse(error, res);
+        return await ErrorResponse(error, res, '/user/update/', data);
     }
 
     return ENV === "DEV" ? res.status(200).send(StandardResponse(
@@ -412,7 +412,7 @@ router.patch('/changepassword', isAuthenticated, [
         await userService.changePassword(data);
 
     } catch (error) {
-        return await ErrorResponse(error, res);
+        return await ErrorResponse(error, res, '/user/changepassword', data);
     }
 
     return ENV === "DEV" ? res.status(200).send(StandardResponse(

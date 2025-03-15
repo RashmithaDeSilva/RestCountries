@@ -1,17 +1,19 @@
 import { Router } from 'express';
 import dotenv from 'dotenv';
 import StandardResponse from '../utils/responses/StandardResponse.mjs';
-import AuthRouter from './AuthRouter.mjs';
+import UserAuthRouter from './UserAuthRouter.mjs';
 import UserRouter from './UserRouter.mjs';
 import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
 import CommonErrors from '../utils/errors/CommonErrors.mjs';
 import ApiKeyRouter from './ApiKeyRouter.mjs';
+import RestCountryRouter from './RestCountryRouter.mjs';
 
 dotenv.config();
 const router = Router();
-router.use('/auth/', AuthRouter);
+router.use('/auth/', UserAuthRouter);
 router.use('/auth/user', UserRouter);
 router.use('/auth/user/apikey', ApiKeyRouter);
+router.use('/auth/restcountry', RestCountryRouter);
 const API_VERSION = process.env.API_VERSION;
 
 /**

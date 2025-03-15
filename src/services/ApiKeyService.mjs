@@ -137,6 +137,16 @@ class ApiKeyService {
             throw error;
         }
     }
+
+    // Check api key is exist
+    async isApiKeyExist(apiKey) {
+        try {
+            return await this.apiKeyDAO.isKeyExists(apiKey);
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default ApiKeyService;

@@ -35,7 +35,7 @@ async function setupDatabase() {
                 location TEXT NOT NULL,
                 message TEXT NOT NULL,
                 stack TEXT NOT NULL,
-                request_data TEXT NOT NULL,
+                request_data TEXT,
                 timeAndDate ${ENV === "PROD" ? "DATETIME DEFAULT CURRENT_TIMESTAMP" : "TEXT DEFAULT (CURRENT_TIMESTAMP)"}
             );`
         );

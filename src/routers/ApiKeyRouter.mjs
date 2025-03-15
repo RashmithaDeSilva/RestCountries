@@ -99,7 +99,7 @@ router.get('/', isAuthenticated, async (req, res) => {
         ));
         
     } catch (error) {
-        return await ErrorResponse(error, res);
+        return await ErrorResponse(error, res, '/apikey/');
     }
 });
 
@@ -276,7 +276,7 @@ router.patch('/changename', isAuthenticated, [
         await apiKeyService.changeApiKeyNameByUserIdAndName(req.user.id, data);
         
     } catch (error) {
-        return await ErrorResponse(error, res);
+        return await ErrorResponse(error, res, '/apikey/changename/', data);
     }
 
     return ENV === "DEV" ? res.status(200).send(StandardResponse(
@@ -447,7 +447,7 @@ router.patch('/generatenewkey', isAuthenticated, [
         apiKeyModel = await apiKeyService.generateNewApiKey(req.user.id, data);
 
     } catch (error) {
-        return await ErrorResponse(error, res);
+        return await ErrorResponse(error, res, '/apikey/generatenewkey/', data);
     }
 
     return ENV === "DEV" ? res.status(200).send(StandardResponse(
@@ -618,7 +618,7 @@ router.post('/createnewkey', isAuthenticated, [
         apiKeyModel = await apiKeyService.createApiKey(req.user.id, data.api_key_name);
 
     } catch (error) {
-        return await ErrorResponse(error, res);
+        return await ErrorResponse(error, res, '/apikey/createnewkey/', data);
     }
 
     return ENV === "DEV" ? res.status(200).send(StandardResponse(
@@ -779,7 +779,7 @@ router.delete('/delete', isAuthenticated, [
         await apiKeyService.deleteApiKeyByUserIdAndKeyName(req.user.id, data);
 
     } catch (error) {
-        return await ErrorResponse(error, res);
+        return await ErrorResponse(error, res, '/apikey/delete/', data);
     }
 
     return ENV === "DEV" ? res.status(200).send(StandardResponse(

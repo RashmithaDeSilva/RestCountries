@@ -22,7 +22,7 @@ const userService = new UserService();
  *     summary: Authenticate user
  *     description: Authenticates a user using email and password, returning a session if successful.
  *     tags:
- *       - Authentication
+ *       - User Authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -139,7 +139,7 @@ router.post('/', [
     async (req, res, next) => {
         passport.authenticate('local', async (error, user) => {
             if (error) {
-                return await ErrorResponse(error, res);
+                return await ErrorResponse(error, res, '/auth/');
             }
             if (!user) {
                 return await ErrorResponse(new Error(DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD), res);
@@ -167,7 +167,7 @@ router.post('/', [
  *     summary: Register a new user
  *     description: Validates user input and registers a new user if valid.
  *     tags:
- *      - Authentication
+ *      - User Authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -286,7 +286,7 @@ router.post('/register', [
         userId = await userService.createUser(data);
 
     } catch (error) {
-        return await ErrorResponse(error, res);
+        return await ErrorResponse(error, res, '/auth/register/', data);
     }
 
     return res.status(201).send(StandardResponse(
@@ -306,7 +306,7 @@ router.post('/register', [
  *     summary: "Log out the user"
  *     description: "Ends the user session and logs the user out."
  *     tags:
- *       - Authentication
+ *       - User Authentication
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -386,7 +386,7 @@ router.post('/logout', isAuthenticated, async (req, res) => {
             null
         ));
     } catch (error) {
-        return await ErrorResponse(error, res);
+        return await ErrorResponse(error, res, '/auth/logout/');
     }
 });
 
