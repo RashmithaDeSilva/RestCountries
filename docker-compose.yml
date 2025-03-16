@@ -21,7 +21,7 @@ services:
       - cw1_network
 
   redis:
-    image: redis/redis-stack
+    image: redis:7.4-alpine3.21
     container_name: session_store
     restart: unles-stop
     ports:

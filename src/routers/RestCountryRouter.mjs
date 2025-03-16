@@ -6,6 +6,7 @@ import CacheStoreService from '../services/CacheStoreService.mjs';
 import ErrorLogService from '../services/ErrorLogService.mjs';
 import CacheStoreErrors from '../utils/errors/CacheStoreErrors.mjs';
 import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
+import RestCountryErrors from '../utils/errors/RestCountryErrors.mjs';
 
 dotenv.config();
 const router = Router();
@@ -144,5 +145,45 @@ router.get('/', isAuthenticated, async (req, res) => {
         return await ErrorResponse(error, res, '/restcountry/');
     }
 });
+
+router.get('/name/:name', isAuthenticated, async (req, res) => {
+    try {
+        const countryName = req.params.name;
+
+        let restCountries;
+        
+        try {
+            // Try to get countries from cache
+            restCountries = await cacheStoreService.getCountryByName(countryName);
+
+            // If no data found in cache, return error
+            if (!restCountries || restCountries.length === 0) {
+                throw new Error(RestCountryErrors.COUNTRY_NOT_FOUND);
+            }
+
+        } catch (cacheError) {
+            // Log cache error
+            await errorLogService.createLog('/restcountry/name', cacheError);
+
+            // If cache fetch fails, fetch from external API
+            const response = await fetch(`${process.env.DATA_RETRIEVE_API}/name/${ encodeURIComponent(countryName) }`);
+            if (!response.ok) {
+                throw new Error(`${ CacheStoreErrors.FAILED_TO_FETCH_DATA } (response status: ${ response.statusText })`);
+            }
+            restCountries = await response.json();
+        }
+
+        return res.status(200).send(StandardResponse(
+            true,
+            `Rest country with name: ${ countryName }`,
+            restCountries,
+            null
+        ));
+        
+    } catch (error) {
+        return await ErrorResponse(error, res, '/restcountry/name');
+    }
+});
+
 
 export default router;

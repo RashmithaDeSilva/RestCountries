@@ -6,14 +6,8 @@ class CacheStoreDAO {
     // Save data in Redis
     async save(cacheStoreModel) {
         try {
-            // Using RedisJSON for structured storage
-            await redisClient.sendCommand([
-                "JSON.SET", 
-                cacheStoreModel.key, 
-                "$", // Store at root ($)
-                JSON.stringify(cacheStoreModel.value)
-            ]);
-            
+            // Save data in Redis as a simple string
+            await redisClient.set(cacheStoreModel.key, JSON.stringify(cacheStoreModel.value));
         } catch (error) {
             throw error;
         }
@@ -22,9 +16,74 @@ class CacheStoreDAO {
     // Retrieve all cached countries
     async getAllCountries() {
         try {
-            const result = await redisClient.sendCommand(["JSON.GET", "cache:countries"]);
-            return result ? JSON.parse(result) : null;
+            const result = await redisClient.get("cache:countries");
+            return result ? JSON.parse(result) : [];
+        } catch (error) {
+            throw error;
+        }
+    }
 
+    // Get country using name (Partial Match)
+    async getCountryByName(name) {
+        try {
+            const allCountries = await this.getAllCountries();
+            return allCountries.filter(country =>
+                country.name.common.toLowerCase().startsWith(name.toLowerCase())
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get country using currency information (Partial Match)
+    async getCountryByCurrency(currency) {
+        try {
+            const allCountries = await this.getAllCountries();
+            return allCountries.filter(country =>
+                Object.keys(country.currencies || {}).some(curr =>
+                    curr.toLowerCase().includes(currency.toLowerCase())
+                )
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get country using capital city (Partial Match)
+    async getCountryByCapital(capital) {
+        try {
+            const allCountries = await this.getAllCountries();
+            return allCountries.filter(country =>
+                country.capital && country.capital.some(cap =>
+                    cap.toLowerCase().startsWith(capital.toLowerCase())
+                )
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get country using spoken languages (Partial Match)
+    async getCountryByLanguage(language) {
+        try {
+            const allCountries = await this.getAllCountries();
+            return allCountries.filter(country =>
+                Object.values(country.languages || {}).some(lang =>
+                    lang.toLowerCase().startsWith(language.toLowerCase())
+                )
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get country using national flag (Exact Match)
+    async getCountryByFlag(flagUrl) {
+        try {
+            const allCountries = await this.getAllCountries();
+            return allCountries.filter(country =>
+                country.flags.png === flagUrl || country.flags.svg === flagUrl
+            );
         } catch (error) {
             throw error;
         }

@@ -5,6 +5,7 @@ import CommonErrors from "../errors/CommonErrors.mjs";
 import ErrorLogService from "../../services/ErrorLogService.mjs";
 import ApiKeyErrors from "../errors/ApiKeyErrors.mjs";
 import CacheStoreErrors from "../errors/CacheStoreErrors.mjs";
+import RestCountryErrors from "../errors/RestCountryErrors.mjs";
 import { LogTypes } from "../types/LogTypes.mjs";
 import { log } from "../ConsoleLog.mjs";
 import dotenv from 'dotenv';
@@ -64,6 +65,14 @@ async function ErrorResponse(error, res, location = null, data = null) {
                     error.message,
                     null,
                     { redirect: `/api/${ API_VERSION }/auth` }
+                ));
+
+            case RestCountryErrors.COUNTRY_NOT_FOUND:
+                return res.status(404).send(StandardResponse(
+                    false,
+                    error.message,
+                    null,
+                    null
                 ));
     
             case ApiKeyErrors.API_KEY_NAME_YOU_TRY_TO_CHANGE_IS_NOT_EXIST:
