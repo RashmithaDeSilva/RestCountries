@@ -1,4 +1,3 @@
-import { RedisStore } from "connect-redis"
 import { createClient } from "redis"
 import dotenv from "dotenv";
 
@@ -23,13 +22,4 @@ console.log("[INFO] - Redis Session Store Client Initialized");
 await redisClient.connect();
 console.log("[INFO] - Redis Session Store Client Connected Successfully");
 
-// Initialize store.
-const redisSessionStore = new RedisStore({
-    client: redisClient,
-    prefix: "session:",
-    // ttl: Number(process.env.REDIS_SESSION_EX_TIME) ?? 86400,
-    disableTTL: true
-})
-console.log("[INFO] - Redis Session Store Initialized");
-
-export default redisSessionStore;
+export default redisClient;
