@@ -21,7 +21,7 @@ async function allCountries() {
         const data = await response.json();
         log(LogTypes.INFO, "All countries data fetched successfully");
         
-        await cacheStoreService.saveRestcountries(new CacheStoreModel("countries", data));
+        await cacheStoreService.saveCache(new CacheStoreModel("cache:countries", data));
         log(LogTypes.INFO, "All countries cached save successfully");
 
     } catch (error) {

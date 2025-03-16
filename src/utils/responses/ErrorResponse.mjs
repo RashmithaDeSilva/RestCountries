@@ -4,6 +4,7 @@ import HashErrors from "../errors/HashErrors.mjs";
 import CommonErrors from "../errors/CommonErrors.mjs";
 import ErrorLogService from "../../services/ErrorLogService.mjs";
 import ApiKeyErrors from "../errors/ApiKeyErrors.mjs";
+import CacheStoreErrors from "../errors/CacheStoreErrors.mjs";
 import { LogTypes } from "../types/LogTypes.mjs";
 import { log } from "../ConsoleLog.mjs";
 import dotenv from 'dotenv';
@@ -101,6 +102,7 @@ async function ErrorResponse(error, res, location = null, data = null) {
             case HashErrors.HASHING_FAILED:
             case HashErrors.HASH_VERIFICATION_FAILED:
             case ApiKeyErrors.FAILED_TO_GENERATE_A_API_KEY:
+            case CacheStoreErrors.FAILED_TO_FETCH_DATA:
                 await logError(location, error, data);
                 return res.status(500).send(StandardResponse(
                     false,

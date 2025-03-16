@@ -1,16 +1,32 @@
-import redisCacheStore from '../stores/CacheStore.mjs';
+import redisClient from '../config/RedisCon.mjs';
 
 class CacheStoreDAO {
-    constructor () {
-    }
+    constructor() {}
 
-    // Save data on redis
+    // Save data in Redis
     async save(cacheStoreModel) {
         try {
-            await redisCacheStore.set(cacheStoreModel.key, cacheStoreModel.value);
+            // Using RedisJSON for structured storage
+            await redisClient.sendCommand([
+                "JSON.SET", 
+                cacheStoreModel.key, 
+                "$", // Store at root ($)
+                JSON.stringify(cacheStoreModel.value)
+            ]);
             
         } catch (error) {
-            throw error
+            throw error;
+        }
+    }
+
+    // Retrieve all cached countries
+    async getAllCountries() {
+        try {
+            const result = await redisClient.sendCommand(["JSON.GET", "cache:countries"]);
+            return result ? JSON.parse(result) : null;
+
+        } catch (error) {
+            throw error;
         }
     }
 }

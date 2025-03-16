@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 const CHARSET = process.env.API_KEY_GENERATE_CHARSET 
-|| 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+';
+|| "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789#%^*()-_=+";
 const length = Number(process.env.API_KEY_LENGTH || 64);
 
 const generateApiKey = () => {

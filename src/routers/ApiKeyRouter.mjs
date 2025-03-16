@@ -234,7 +234,7 @@ router.get('/', isAuthenticated, async (req, res) => {
  *                   type: string
  *                   example: null
  *       500:
- *         description: "Internal server error (e.g., failure to generate a new API key)."
+ *         description: "Internal server error."
  *         content:
  *           application/json:
  *             schema:
@@ -405,7 +405,7 @@ router.patch('/changename', isAuthenticated, [
  *                       location:
  *                         type: string
  *       500:
- *         description: "Internal server error (e.g., failure to generate a new API key)."
+ *         description: "Internal server error."
  *         content:
  *           application/json:
  *             schema:
@@ -576,7 +576,7 @@ router.patch('/generatenewkey', isAuthenticated, [
  *                   type: string
  *                   example: "You have reached the maximum number of API keys allowed. Please delete an existing key or contact support."
  *       500:
- *         description: "Internal server error (e.g., failure to generate a new API key)."
+ *         description: "Internal server error."
  *         content:
  *           application/json:
  *             schema:
@@ -738,7 +738,7 @@ router.post('/createnewkey', isAuthenticated, [
  *                   type: string
  *                   example: null
  *       500:
- *         description: "Internal server error (e.g., failure to generate a new API key)."
+ *         description: "Internal server error."
  *         content:
  *           application/json:
  *             schema:
