@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cd backend
 # Install necessary dependencies
 npm install
 

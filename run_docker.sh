@@ -31,7 +31,7 @@ cleanup_image
 
 # Build the new Docker image
 echo "Building new Docker image..."
-docker build -t cw1_image .
+docker build -t cw1_image ./backend
 
 # Run the new container
 echo "Running new container..."

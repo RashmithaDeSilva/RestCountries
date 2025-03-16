@@ -32,7 +32,7 @@ services:
   node_app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./backend/Dockerfile
     container_name: node_app
     restart: unles-stop
     working_dir: /app
