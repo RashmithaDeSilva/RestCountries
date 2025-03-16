@@ -1,5 +1,7 @@
 import { RedisStore } from "connect-redis"
 import redisClient from "../config/RedisCon.mjs";
+import { LogTypes } from "../utils/types/LogTypes.mjs";
+import { log } from "../utils/ConsoleLog.mjs";
 
 // Initialize store.
 const redisSessionStore = new RedisStore({
@@ -7,6 +9,6 @@ const redisSessionStore = new RedisStore({
     prefix: "session:",
     // disableTTL: true
 })
-console.log("[INFO] - Redis Session Store Initialized");
+log(LogTypes.INFO, "Session Store Initialized");
 
 export default redisSessionStore;

@@ -4,6 +4,8 @@ import HashErrors from "../errors/HashErrors.mjs";
 import CommonErrors from "../errors/CommonErrors.mjs";
 import ErrorLogService from "../../services/ErrorLogService.mjs";
 import ApiKeyErrors from "../errors/ApiKeyErrors.mjs";
+import { LogTypes } from "../types/LogTypes.mjs";
+import { log } from "../ConsoleLog.mjs";
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -17,7 +19,7 @@ async function logError(location, error, data) {
         await errorLogService.createLog(location, error, data);
 
     } catch (error) {
-        console.log("[ERROR] - ", error);
+        log(LogTypes.ERROR, error);
     }
 }
 
@@ -118,7 +120,7 @@ async function ErrorResponse(error, res, location = null, data = null) {
         }
         
     } catch (error) {
-        console.log("[ERROR] - ", error);
+        log(LogTypes.ERROR, error);
         return res.status(500).send(StandardResponse(
             false,
             CommonErrors.INTERNAL_SERVER_ERROR,

@@ -1,5 +1,7 @@
 import { RedisStore } from "connect-redis"
 import redisClient from "../config/RedisCon.mjs";
+import { LogTypes } from "../utils/types/LogTypes.mjs";
+import { log } from "../utils/ConsoleLog.mjs";
 
 // Initialize store.
 const redisCacheStore = new RedisStore({
@@ -8,6 +10,6 @@ const redisCacheStore = new RedisStore({
     // ttl: 60 * 60,
     disableTTL: true
 })
-console.log("[INFO] - Redis Cache Store Initialized");
+log(LogTypes.INFO, "Cache Store Initialized");
 
 export default redisCacheStore;

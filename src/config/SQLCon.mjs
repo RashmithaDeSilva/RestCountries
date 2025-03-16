@@ -1,6 +1,8 @@
 import sqlite3 from "sqlite3";
 import mysql2 from "mysql2/promise";
 import dotenv from "dotenv";
+import { LogTypes } from "../utils/types/LogTypes.mjs";
+import { log } from "../utils/ConsoleLog.mjs";
 
 dotenv.config();
 const MYSQL_DB_HOST = process.env.MYSQL_DB_HOST || "localhost";
@@ -21,7 +23,7 @@ async function initializeDatabase() {
 
             await connection.query(`CREATE DATABASE IF NOT EXISTS ${ DB_NAME }`);
             await connection.end();
-            console.log("[INFO] - Database ensured");
+            log(LogTypes.INFO, "Database ensured");
 
             pool = mysql2.createPool({
                 host: MYSQL_DB_HOST,
@@ -32,16 +34,16 @@ async function initializeDatabase() {
                 connectionLimit: 10,
                 queueLimit: 0,
             });
-            console.log("[INFO] - MySQL Connection Pool Initialized");
+            log(LogTypes.INFO, "MySQL Connection Pool Initialized");
 
         } else if (process.env.ENV === "DEV") {
             sqlite3.verbose();
             pool = new sqlite3.Database(`./${ DB_NAME }.db`, (err) => {
                 if (err) {
-                    console.error("[ERROR] - SQLite Connection Failed...", err);
+                    log(LogTypes.ERROR, `SQLite Connection Failed ${ err }`);
                     process.exit(1);
                 } else {
-                    console.log("[INFO] - SQLite Connected Successfully");
+                    log(LogTypes.INFO, "SQLite Connected Successfully");
                 }
             });
 
@@ -54,11 +56,12 @@ async function initializeDatabase() {
                     });
                 });
             };
+            log(LogTypes.INFO, "SQLite Connection Pool Initialized");
         }
 
         return pool;
     } catch (error) {
-        console.error("[ERROR] - Database Initialization Failed...", error);
+        log(LogTypes.ERROR, `Database Initialization Failed ${ error }`);
         process.exit(1);
     }
 }

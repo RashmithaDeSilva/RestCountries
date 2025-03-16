@@ -6,7 +6,9 @@ import router from './src/routers/Router.mjs';
 import passport from 'passport';
 import './src/strategies/local-strategy.mjs';
 import redisSessionStore from './src/stores/SessionStore.mjs';
-import cacheStoreController from './src/controller/CacheStoreController.mjs';
+import cacheStoreUpdate from './src/utils/CacheStoreUpdate.mjs';
+import { LogTypes } from './src/utils/types/LogTypes.mjs';
+import { log } from './src/utils/ConsoleLog.mjs';
 
 // Setup express app
 dotenv.config();
@@ -16,7 +18,7 @@ const API_VERSION = process.env.API_VERSION || 'v1';
 const ENV = process.env.ENV || 'DEV';
 
 // Cache store setup
-cacheStoreController()
+cacheStoreUpdate()
 
 // Swagger setup
 if (ENV === "DEV") {
@@ -47,9 +49,9 @@ app.use(express.json());
 app.use(`/api/${ API_VERSION }/`, router);
 
 app.listen(PORT, ()=>{
-    console.log(`[INFO] - Server is running on http://localhost:${ PORT }`);
+    log(LogTypes.INFO, `Server is running on http://localhost:${ PORT }`);
     if (ENV === "DEV") {
-        console.log(`[INFO] - Swagger doc available on http://localhost:${ PORT }/api/${ API_VERSION }/api-docs`);
+        log(LogTypes.INFO, `Swagger doc available on http://localhost:${ PORT }/api/${ API_VERSION }/api-docs`);
     }
 });
 

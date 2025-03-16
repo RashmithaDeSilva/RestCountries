@@ -1,5 +1,7 @@
 import { createClient } from "redis"
 import dotenv from "dotenv";
+import { LogTypes } from "../utils/types/LogTypes.mjs";
+import { log } from "../utils/ConsoleLog.mjs";
 
 dotenv.config();
 
@@ -13,13 +15,13 @@ const redisClient = createClient({
 
 // Handle errors properly
 redisClient.on("[ERROR] - ", (error) => {
-    console.log("[INFO] - Redis client error: ", error);
+    log(LogTypes.ERROR, `Redis client error: ${ error }`);
     process.exit(1);
 });
-console.log("[INFO] - Redis Session Store Client Initialized");
+log(LogTypes.INFO, "Redis Client Initialized");
 
 // Connect with redis
 await redisClient.connect();
-console.log("[INFO] - Redis Session Store Client Connected Successfully");
+log(LogTypes.INFO, "Redis Client Connected Successfully");
 
 export default redisClient;

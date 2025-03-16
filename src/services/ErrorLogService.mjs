@@ -1,5 +1,7 @@
 import ErrorLogDAO from '../DAOs/ErrorLogDAO.mjs';
 import ErrorLogModel from '../models/ErrorLogModel.mjs';
+import { log } from '../utils/ConsoleLog.mjs';
+import { LogTypes } from '../utils/types/LogTypes.mjs';
 
 class ErrorLogService {
     constructor() {
@@ -7,14 +9,14 @@ class ErrorLogService {
     }
 
     // Create log
-    async createLog(location, error, requestData) {
+    async createLog(location, error, requestData = null) {
         try {
             const errorLog = new ErrorLogModel(location, error.message, 
                 error.stack, requestData);
             await this.errorLogDAO.create(errorLog);
 
         } catch (error) {
-            console.error("[ERROR] - Failed to log error: ", error);
+            log(LogTypes.ERROR, `Failed to log error: ${ error }`);
         }
     }
 }
