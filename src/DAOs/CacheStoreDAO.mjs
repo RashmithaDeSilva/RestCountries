@@ -77,17 +77,22 @@ class CacheStoreDAO {
         }
     }
 
-    // Get country using national flag (Exact Match)
-    async getCountryByFlag(flagUrl) {
+    // Get flage using country name
+    async getFlagByCountryName(name) {
         try {
             const allCountries = await this.getAllCountries();
-            return allCountries.filter(country =>
-                country.flags.png === flagUrl || country.flags.svg === flagUrl
-            );
+            return allCountries
+                .filter(country =>
+                    country.name.common.toLowerCase().includes(name.toLowerCase())
+                )
+                .map(country => ({
+                    name: country.name.common,
+                    flags: country.flags
+                }));
         } catch (error) {
             throw error;
         }
-    }
+    }    
 }
 
 export default CacheStoreDAO;

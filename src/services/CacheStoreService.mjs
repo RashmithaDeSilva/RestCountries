@@ -77,9 +77,9 @@ class CacheStoreService {
     }
 
     // Get country by national flag (Exact Match)
-    async getCountryByFlag(flagUrl) {
+    async getFlagByCountryName(name) {
         try {
-            const countrys = await this.cacheStoreDAO.getCountryByFlag(flagUrl);
+            const countrys = await this.cacheStoreDAO.getFlagByCountryName(name);
             return this.getCountryResponse(countrys);
 
         } catch (error) {
