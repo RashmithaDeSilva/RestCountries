@@ -6,6 +6,7 @@ import router from './src/routers/Router.mjs';
 import passport from 'passport';
 import './src/strategies/local-strategy.mjs';
 import redisSessionStore from './src/stores/SessionStore.mjs';
+import cacheStoreController from './src/controller/CacheStoreController.mjs';
 
 // Setup express app
 dotenv.config();
@@ -13,6 +14,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const API_VERSION = process.env.API_VERSION || 'v1';
 const ENV = process.env.ENV || 'DEV';
+
+// Cache store setup
+cacheStoreController()
 
 // Swagger setup
 if (ENV === "DEV") {
