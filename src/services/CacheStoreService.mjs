@@ -26,7 +26,6 @@ class CacheStoreService {
         try {
             const countrys = await this.cacheStoreDAO.getAllCountries();
             return this.getCountryResponse(countrys);
-
         } catch (error) {
             throw error;
         }
@@ -37,7 +36,6 @@ class CacheStoreService {
         try {
             const countrys = await this.cacheStoreDAO.getCountryByName(name);
             return this.getCountryResponse(countrys);
-
         } catch (error) {
             throw error;
         }
@@ -48,7 +46,6 @@ class CacheStoreService {
         try {
             const countrys = await this.cacheStoreDAO.getCountryByCurrency(currency);
             return this.getCountryResponse(countrys);
-
         } catch (error) {
             throw error;
         }
@@ -59,7 +56,6 @@ class CacheStoreService {
         try {
             const countrys = await this.cacheStoreDAO.getCountryByCapital(capital);
             return this.getCountryResponse(countrys);
-
         } catch (error) {
             throw error;
         }
@@ -70,7 +66,6 @@ class CacheStoreService {
         try {
             const countrys = await this.cacheStoreDAO.getCountryByLanguage(language);
             return this.getCountryResponse(countrys);
-
         } catch (error) {
             throw error;
         }
@@ -81,7 +76,36 @@ class CacheStoreService {
         try {
             const countrys = await this.cacheStoreDAO.getFlagByCountryName(name);
             return this.getCountryResponse(countrys);
+        } catch (error) {
+            throw error;
+        }
+    }
 
+    // Get country by region (Partial Match)
+    async getCountryByRegion(region) {
+        try {
+            const countrys = await this.cacheStoreDAO.getCountryByRegion(region);
+            return this.getCountryResponse(countrys);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get country by subregion (Partial Match)
+    async getCountryBySubregion(subregion) {
+        try {
+            const countrys = await this.cacheStoreDAO.getCountryBySubregion(subregion);
+            return this.getCountryResponse(countrys);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get country by translation name (Partial Match)
+    async getCountryByTranslation(translation) {
+        try {
+            const countrys = await this.cacheStoreDAO.getCountryByTranslation(translation);
+            return this.getCountryResponse(countrys);
         } catch (error) {
             throw error;
         }

@@ -77,7 +77,7 @@ class CacheStoreDAO {
         }
     }
 
-    // Get flage using country name
+    // Get flag using country name
     async getFlagByCountryName(name) {
         try {
             const allCountries = await this.getAllCountries();
@@ -92,7 +92,45 @@ class CacheStoreDAO {
         } catch (error) {
             throw error;
         }
-    }    
+    }
+
+    // Get country using region (Partial Match)
+    async getCountryByRegion(region) {
+        try {
+            const allCountries = await this.getAllCountries();
+            return allCountries.filter(country =>
+                country.region && country.region.toLowerCase().includes(region.toLowerCase())
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get country using subregion (Partial Match)
+    async getCountryBySubregion(subregion) {
+        try {
+            const allCountries = await this.getAllCountries();
+            return allCountries.filter(country =>
+                country.subregion && country.subregion.toLowerCase().includes(subregion.toLowerCase())
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get country by translation name (Partial Match)
+    async getCountryByTranslation(translation) {
+        try {
+            const allCountries = await this.getAllCountries();
+            return allCountries.filter(country =>
+                Object.values(country.translations || {}).some(trans =>
+                    trans.common.toLowerCase().includes(translation.toLowerCase())
+                )
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default CacheStoreDAO;
