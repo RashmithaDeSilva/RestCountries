@@ -14,10 +14,19 @@ class CacheStoreService {
         }
     }
 
+    getCountryResponse(countrys) {
+        return {
+            "countrys_count": countrys.length,
+            "countrys": countrys
+        }
+    }
+
     // Get all countries
     async getAllCountries() {
         try {
-            return await this.cacheStoreDAO.getAllCountries();
+            const countrys = await this.cacheStoreDAO.getAllCountries();
+            return this.getCountryResponse(countrys);
+
         } catch (error) {
             throw error;
         }
@@ -26,7 +35,9 @@ class CacheStoreService {
     // Get country by name (Partial Match)
     async getCountryByName(name) {
         try {
-            return await this.cacheStoreDAO.getCountryByName(name);
+            const countrys = await this.cacheStoreDAO.getCountryByName(name);
+            return this.getCountryResponse(countrys);
+
         } catch (error) {
             throw error;
         }
@@ -35,7 +46,9 @@ class CacheStoreService {
     // Get country by currency (Partial Match)
     async getCountryByCurrency(currency) {
         try {
-            return await this.cacheStoreDAO.getCountryByCurrency(currency);
+            const countrys = await this.cacheStoreDAO.getCountryByCurrency(currency);
+            return this.getCountryResponse(countrys);
+
         } catch (error) {
             throw error;
         }
@@ -44,7 +57,9 @@ class CacheStoreService {
     // Get country by capital city (Partial Match)
     async getCountryByCapital(capital) {
         try {
-            return await this.cacheStoreDAO.getCountryByCapital(capital);
+            const countrys = await this.cacheStoreDAO.getCountryByCapital(capital);
+            return this.getCountryResponse(countrys);
+
         } catch (error) {
             throw error;
         }
@@ -53,7 +68,9 @@ class CacheStoreService {
     // Get country by spoken language (Partial Match)
     async getCountryByLanguage(language) {
         try {
-            return await this.cacheStoreDAO.getCountryByLanguage(language);
+            const countrys = await this.cacheStoreDAO.getCountryByLanguage(language);
+            return this.getCountryResponse(countrys);
+
         } catch (error) {
             throw error;
         }
@@ -62,7 +79,9 @@ class CacheStoreService {
     // Get country by national flag (Exact Match)
     async getCountryByFlag(flagUrl) {
         try {
-            return await this.cacheStoreDAO.getCountryByFlag(flagUrl);
+            const countrys = await this.cacheStoreDAO.getCountryByFlag(flagUrl);
+            return this.getCountryResponse(countrys);
+
         } catch (error) {
             throw error;
         }
