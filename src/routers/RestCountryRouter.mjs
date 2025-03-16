@@ -104,6 +104,7 @@ const errorLogService = new ErrorLogService();
  *                   example: "Internal server error"
  *                 data:
  *                   type: "null"
+ *                   example: null
  *                 errors:
  *                   type: string
  *                   example: null
@@ -146,6 +147,135 @@ router.get('/', isAuthenticated, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/v1/auth/restcountry/name/{name}:
+ *   get:
+ *     summary: "Retrieve country by name"
+ *     description: "Fetches a country by its name from the cache or an external API if the cache fails."
+ *     tags:
+ *       - "RestCountry"
+ *     parameters:
+ *       - in: path
+ *         name: name
+ *         required: true
+ *         description: "The name of the country to retrieve."
+ *         schema:
+ *           type: string
+ *           example: "Sri Lanka"
+ *     security:
+ *       - apiKeyAuth: []
+ *     responses:
+ *       200:
+ *         description: "Successfully retrieved the country by name."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Rest country with name: Sri Lanka"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                         example: "Sri Lanka"
+ *                       code:
+ *                         type: string
+ *                         example: "LK"
+ *                 errors:
+ *                   type: "null"
+ *                   example: null
+ *       400:
+ *         description: "Invalid API key or missing authorization header."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid API key"
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ *       401:
+ *         description: "API key is required in the request header."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "API key required"
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: {"redirect":"/api/v1/auth"}
+ *       404:
+ *         description: "Country not found."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Country not found"
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ *       500:
+ *         description: "Internal server error."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ * components:
+ *   securitySchemes:
+ *     apiKeyAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: Authorization
+ */
 router.get('/name/:name', isAuthenticated, async (req, res) => {
     try {
         const countryName = req.params.name;
