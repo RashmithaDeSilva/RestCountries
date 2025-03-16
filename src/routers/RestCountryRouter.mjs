@@ -501,4 +501,179 @@ router.get('/currency/:name', isAuthenticated, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/v1/auth/restcountry/capital/{name}:
+ *   get:
+ *     summary: "Retrieve countries by capital city"
+ *     description: "Fetches a list of countries that have the specified capital from the cache or an external API if the cache fails."
+ *     tags:
+ *       - "RestCountry"
+ *     parameters:
+ *       - in: path
+ *         name: name
+ *         required: true
+ *         description: "The capital city name to find associated countries."
+ *         schema:
+ *           type: string
+ *           example: "Paris"
+ *     security:
+ *       - apiKeyAuth: []
+ *     responses:
+ *       200:
+ *         description: "Successfully retrieved the list of countries by capital."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Rest country with capital: Paris"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     countrys_count:
+ *                       type: integer
+ *                       example: 3
+ *                     countrys:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           name:
+ *                             type: string
+ *                             example: "France"
+ *                           code:
+ *                             type: string
+ *                             example: "FR"
+ *                 errors:
+ *                   type: "null"
+ *                   example: null
+ *       400:
+ *         description: "Invalid API key or missing authorization header."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid API key"
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ *       401:
+ *         description: "API key is required in the request header."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "API key required"
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: {"redirect":"/api/v1/auth"}
+ *       404:
+ *         description: "Country not found."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Country not found"
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ *       500:
+ *         description: "Internal server error."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ * components:
+ *   securitySchemes:
+ *     apiKeyAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: Authorization
+ */
+router.get('/capital/:name', isAuthenticated, async (req, res) => {
+    try {
+        const capitalName = req.params.name;
+
+        let restCountries;
+        
+        try {
+            // Try to get countries from cache
+            restCountries = await cacheStoreService.getCountryByCapital(capitalName);
+
+            // If no data found in cache, return error
+            if (!restCountries || restCountries.length === 0) {
+                throw new Error(RestCountryErrors.COUNTRY_NOT_FOUND);
+            }
+
+        } catch (cacheError) {
+            // Log cache error
+            await errorLogService.createLog('/restcountry/capital', cacheError);
+
+            // If cache fetch fails, fetch from external API
+            const response = await fetch(`${process.env.DATA_RETRIEVE_API}/capital/${ encodeURIComponent(capitalName) }`);
+            if (!response.ok) {
+                throw new Error(`${ CacheStoreErrors.FAILED_TO_FETCH_DATA } (response status: ${ response.statusText })`);
+            }
+            restCountries = await response.json();
+        }
+
+        return res.status(200).send(StandardResponse(
+            true,
+            `Rest country with capital: ${ capitalName }`,
+            restCountries,
+            null
+        ));
+        
+    } catch (error) {
+        return await ErrorResponse(error, res, '/restcountry/capital');
+    }
+});
+
+
 export default router;

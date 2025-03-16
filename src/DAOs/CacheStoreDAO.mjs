@@ -28,7 +28,7 @@ class CacheStoreDAO {
         try {
             const allCountries = await this.getAllCountries();
             return allCountries.filter(country =>
-                country.name.common.toLowerCase().startsWith(name.toLowerCase())
+                country.name.common.toLowerCase().includes(name.toLowerCase())
             );
         } catch (error) {
             throw error;
@@ -55,7 +55,7 @@ class CacheStoreDAO {
             const allCountries = await this.getAllCountries();
             return allCountries.filter(country =>
                 country.capital && country.capital.some(cap =>
-                    cap.toLowerCase().startsWith(capital.toLowerCase())
+                    cap.toLowerCase().includes(capital.toLowerCase())
                 )
             );
         } catch (error) {
@@ -69,7 +69,7 @@ class CacheStoreDAO {
             const allCountries = await this.getAllCountries();
             return allCountries.filter(country =>
                 Object.values(country.languages || {}).some(lang =>
-                    lang.toLowerCase().startsWith(language.toLowerCase())
+                    lang.toLowerCase().includes(language.toLowerCase())
                 )
             );
         } catch (error) {
