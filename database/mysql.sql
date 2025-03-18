@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS users (
 -- Subscription users table
 CREATE TABLE IF NOT EXISTS subscription_users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    subscription_id INT,
-    user_id INT,
+    subscription_id INT DEFAULT 1, -- Default to free plan
+    user_id INT NOT NULL,
     insert_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expiry_time TIMESTAMP DEFAULT (DATE_ADD(NOW(), INTERVAL 30 DAY)),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS api_keys (
     id INT PRIMARY KEY AUTO_INCREMENT,
     key_name VARCHAR(50) NOT NULL,
     api_key VARCHAR(255) NOT NULL,
-    user_id INT,
+    user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     UNIQUE (api_key)
 );
@@ -55,9 +55,10 @@ CREATE TABLE IF NOT EXISTS api_keys (
 -- API key usage table
 CREATE TABLE IF NOT EXISTS api_key_usage (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    key_usage INT NOT NULL,
-    user_id INT,
-    subscription_type_id INT,
+    key_usage INT NOT NULL DEFAULT 0,
+    user_id INT NOT NULL,
+    subscription_type_id INT NOT NULL DEFAULT 1,
+    last_reset TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subscription_type_id) REFERENCES subscription_types(id) ON DELETE CASCADE
 );
@@ -65,38 +66,49 @@ CREATE TABLE IF NOT EXISTS api_key_usage (
 -- Enable event scheduler
 SET GLOBAL event_scheduler = ON;
 
--- Check expired subscriptions event
+-- Reset free user API usage on the 1st of every month
+CREATE EVENT IF NOT EXISTS reset_free_users_usage
+ON SCHEDULE EVERY 1 MONTH STARTS TIMESTAMP(CONCAT(YEAR(NOW()), '-', MONTH(NOW()), '-01 00:00:00'))
+DO
+BEGIN
+    UPDATE api_key_usage
+    SET key_usage = 0, last_reset = NOW()
+    WHERE subscription_type_id = 1;
+END;
+
+-- Check expired subscriptions daily and reset to free plan
 CREATE EVENT IF NOT EXISTS check_expired_subscriptions
 ON SCHEDULE EVERY 1 DAY
 DO
 BEGIN
+    UPDATE subscription_users
+    SET subscription_id = 1, expiry_time = DATE_ADD(NOW(), INTERVAL 30 DAY)
+    WHERE expiry_time <= NOW();
+    
     UPDATE api_key_usage
-    SET subscription_type_id = 1
-    WHERE user_id IN (
-        SELECT user_id FROM subscription_users WHERE expiry_time <= NOW()
+    SET subscription_type_id = 1, key_usage = 0, last_reset = NOW()
+    WHERE user_id IN (SELECT user_id FROM subscription_users WHERE subscription_id = 1);
+    
+    DELETE FROM api_keys
+    WHERE user_id IN (SELECT user_id FROM subscription_users WHERE subscription_id = 1)
+    AND id NOT IN (
+        SELECT MIN(id) FROM api_keys GROUP BY user_id
     );
 END;
 
--- Insert api key usage on new user trigger
+-- Insert API key usage for new users
 CREATE TRIGGER IF NOT EXISTS insert_api_key_usage_on_new_user
 AFTER INSERT ON users
 FOR EACH ROW
 BEGIN
-    INSERT IGNORE INTO api_key_usage (user_id, subscription_type_id, key_usage)
+    INSERT INTO api_key_usage (user_id, subscription_type_id, key_usage)
     VALUES (NEW.id, 1, 0);
+    
+    INSERT INTO subscription_users (user_id, subscription_id, insert_time, expiry_time)
+    VALUES (NEW.id, 1, NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY));
 END;
 
--- Subscription users expiry time trigger
-CREATE TRIGGER IF NOT EXISTS set_expiry_time
-AFTER INSERT ON subscription_users
-FOR EACH ROW
-BEGIN
-    UPDATE subscription_users
-    SET expiry_time = DATE_ADD(NEW.insert_time, INTERVAL 30 DAY)
-    WHERE id = NEW.id;
-END;
-
--- Update api key usage subscription trigger
+-- Update API key usage on subscription change
 CREATE TRIGGER IF NOT EXISTS update_api_key_usage_subscription
 AFTER INSERT ON subscription_users
 FOR EACH ROW

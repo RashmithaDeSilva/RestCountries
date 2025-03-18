@@ -1,9 +1,9 @@
 -- Subscription types table
 CREATE TABLE IF NOT EXISTS subscription_types (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    subscription_name VARCHAR(50) NOT NULL,
+    subscription_name TEXT NOT NULL,
     subscription_price INTEGER NOT NULL,
-    subscription_price_currency VARCHAR(50) NOT NULL,
+    subscription_price_currency TEXT NOT NULL,
     api_request_limit INTEGER NOT NULL,
     api_key_limit INTEGER NOT NULL,
     description TEXT,
@@ -17,27 +17,27 @@ CREATE TABLE IF NOT EXISTS error_logs (
     message TEXT NOT NULL,
     stack TEXT NOT NULL,
     request_data TEXT NOT NULL,
-    timeAndDate TEXT DEFAULT (CURRENT_TIMESTAMP)
+    timeAndDate DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    first_name VARCHAR(50) NOT NULL,
-    surname VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    contact_number VARCHAR(20),
+    first_name TEXT NOT NULL,
+    surname TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    contact_number TEXT,
     verify BOOLEAN DEFAULT FALSE,
-    password_hash VARCHAR(255) NOT NULL
+    password_hash TEXT NOT NULL
 );
 
 -- Subscription users table
 CREATE TABLE IF NOT EXISTS subscription_users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    subscription_id INTEGER,
-    user_id INTEGER,
-    insert_time TEXT DEFAULT CURRENT_TIMESTAMP,
-    expiry_time TEXT DEFAULT (DATETIME('now', '+30 days')),
+    subscription_id INTEGER DEFAULT 1, -- Default to free plan
+    user_id INTEGER NOT NULL,
+    insert_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expiry_time TIMESTAMP DEFAULT (DATETIME('now', '+30 days')),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subscription_id) REFERENCES subscription_types(id) ON DELETE CASCADE
 );
@@ -45,46 +45,65 @@ CREATE TABLE IF NOT EXISTS subscription_users (
 -- API key table
 CREATE TABLE IF NOT EXISTS api_keys (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    key_name VARCHAR(50) NOT NULL,
-    api_key VARCHAR(255) NOT NULL,
-    user_id INTEGER,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    UNIQUE (api_key)
+    key_name TEXT NOT NULL,
+    api_key TEXT NOT NULL UNIQUE,
+    user_id INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- API key usage table
 CREATE TABLE IF NOT EXISTS api_key_usage (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    key_usage INTEGER NOT NULL,
-    user_id INTEGER,
-    subscription_type_id INTEGER,
+    key_usage INTEGER NOT NULL DEFAULT 0,
+    user_id INTEGER NOT NULL,
+    subscription_type_id INTEGER NOT NULL DEFAULT 1,
+    last_reset TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subscription_type_id) REFERENCES subscription_types(id) ON DELETE CASCADE
 );
 
--- Insert api key usage on new user trigger
-CREATE TRIGGER IF NOT EXISTS insert_api_key_usage_on_new_user
-AFTER INSERT ON users
-FOR EACH ROW
+-- Reset free user API usage on the 1st of every month
+CREATE TRIGGER IF NOT EXISTS reset_free_users_usage
+AFTER INSERT ON api_key_usage
 BEGIN
-    INSERT OR IGNORE INTO api_key_usage (user_id, subscription_type_id, key_usage)
-    VALUES (NEW.id, 1, 0);
+    UPDATE api_key_usage
+    SET key_usage = 0, last_reset = CURRENT_TIMESTAMP
+    WHERE subscription_type_id = 1 AND strftime('%d', CURRENT_TIMESTAMP) = '01';
 END;
 
--- Subscription users expiry time trigger
-CREATE TRIGGER IF NOT EXISTS set_expiry_time
-AFTER INSERT ON subscription_users
-FOR EACH ROW
+-- Check expired subscriptions daily and reset to free plan
+CREATE TRIGGER IF NOT EXISTS check_expired_subscriptions
+AFTER UPDATE ON subscription_users
 BEGIN
     UPDATE subscription_users
-    SET expiry_time = DATETIME(NEW.insert_time, '+30 days')
-    WHERE id = NEW.id;
+    SET subscription_id = 1, expiry_time = DATETIME('now', '+30 days')
+    WHERE expiry_time <= CURRENT_TIMESTAMP;
+    
+    UPDATE api_key_usage
+    SET subscription_type_id = 1, key_usage = 0, last_reset = CURRENT_TIMESTAMP
+    WHERE user_id IN (SELECT user_id FROM subscription_users WHERE subscription_id = 1);
+    
+    DELETE FROM api_keys
+    WHERE user_id IN (SELECT user_id FROM subscription_users WHERE subscription_id = 1)
+    AND id NOT IN (
+        SELECT MIN(id) FROM api_keys GROUP BY user_id
+    );
 END;
 
--- Update api key usage subscription trigger
+-- Insert API key usage for new users
+CREATE TRIGGER IF NOT EXISTS insert_api_key_usage_on_new_user
+AFTER INSERT ON users
+BEGIN
+    INSERT INTO api_key_usage (user_id, subscription_type_id, key_usage)
+    VALUES (NEW.id, 1, 0);
+    
+    INSERT INTO subscription_users (user_id, subscription_id, insert_time, expiry_time)
+    VALUES (NEW.id, 1, CURRENT_TIMESTAMP, DATETIME('now', '+30 days'));
+END;
+
+-- Update API key usage on subscription change
 CREATE TRIGGER IF NOT EXISTS update_api_key_usage_subscription
 AFTER INSERT ON subscription_users
-FOR EACH ROW
 BEGIN
     UPDATE api_key_usage
     SET subscription_type_id = NEW.subscription_id
