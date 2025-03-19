@@ -38,7 +38,7 @@ const userService = new UserService();
  *               password:
  *                 type: string
  *                 format: password
- *                 example: 123456789012
+ *                 example: password12345
  *                 description: User's password
  *     responses:
  *       200:
@@ -185,24 +185,30 @@ router.post('/', [
  *               first_name:
  *                 type: string
  *                 description: The first name of the user.
+ *                 example: first name
  *               surname:
  *                 type: string
  *                 description: The surname of the user.
+ *                 example: surname
  *               email:
  *                 type: string
  *                 format: email
  *                 description: The email of the user.
+ *                 example: user@example.com
  *               contact_number:
  *                 type: string
  *                 description: The user's contact number.
+ *                 example: +94761234567
  *               password:
  *                 type: string
  *                 format: password
  *                 description: The user's password.
+ *                 example: password12345
  *               confirm_password:
  *                 type: string
  *                 format: password
  *                 description: Confirmation of the user's password.
+ *                 example: password12345
  *     responses:
  *       201:
  *         description: User registered successfully.

@@ -8,7 +8,7 @@ import UserModel from "../models/UserModel.mjs";
 const userService = new UserService();
 
 // Take user object and store in session
-passport.serializeUser((user, done) => {;
+passport.serializeUser((user, done) => {
     done(null, user.id);
 });
 
@@ -28,7 +28,7 @@ passport.deserializeUser(async (id, done) => {
         done(null, responseUserModel);
 
     } catch (error) {
-        done(error, null);
+        done(error, false);
     }
 });
 

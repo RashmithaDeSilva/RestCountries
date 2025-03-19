@@ -4,11 +4,9 @@
   "description": "In this project, I develop a secure API middleware service that interfaces with RestCountries.com, a comprehensive RESTful service providing detailed information about countries worldwide. This application will serve as an intermediary layer, processing and filtering country data while implementing robust security measures.",
   "main": "index.js",
   "scripts": {
-    "start": "npm run setup-db-prod && cross-env ENV=PROD node index.mjs",
-    "dev": "npm run setup-db-dev && cross-env ENV=DEV nodemon index.mjs",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "setup-db-prod": "cross-env ENV=PROD node ./src/config/TableSetup.mjs",
-    "setup-db-dev": "cross-env ENV=DEV node ./src/config/TableSetup.mjs"
+    "start": "cross-env ENV=PROD node index.mjs",
+    "dev": "cross-env ENV=DEV nodemon index.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",

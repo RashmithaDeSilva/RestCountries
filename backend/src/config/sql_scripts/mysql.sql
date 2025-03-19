@@ -1,3 +1,9 @@
+-- Create database
+CREATE DATABASE IF NOT EXISTS cw1;
+
+-- Use database that create
+USE cw1;
+
 -- Subscription types table
 CREATE TABLE IF NOT EXISTS subscription_types (
     id INT AUTO_INCREMENT PRIMARY KEY,
