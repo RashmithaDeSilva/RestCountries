@@ -7,11 +7,13 @@ import ErrorLogService from '../services/ErrorLogService.mjs';
 import CacheStoreErrors from '../utils/errors/CacheStoreErrors.mjs';
 import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
 import RestCountryErrors from '../utils/errors/RestCountryErrors.mjs';
+import ApiKeyUsageService from '../services/ApiKeyUsageService.mjs';
 
 dotenv.config();
 const router = Router();
 const cacheStoreService = new CacheStoreService();
 const errorLogService = new ErrorLogService();
+const apiKeyUsageService = new ApiKeyUsageService();
 
 /**
  * @swagger
@@ -123,6 +125,7 @@ const errorLogService = new ErrorLogService();
  */
 router.get('/', isAuthenticated, async (req, res) => {
     try {
+        await apiKeyUsageService.isUserCanRequest(req.user.id);
         let restCountries;
         
         try {
@@ -290,8 +293,8 @@ router.get('/', isAuthenticated, async (req, res) => {
  */
 router.get('/name/:name', isAuthenticated, async (req, res) => {
     try {
+        await apiKeyUsageService.isUserCanRequest(req.user.id);
         const countryName = req.params.name;
-
         let restCountries;
         
         try {
@@ -464,8 +467,8 @@ router.get('/name/:name', isAuthenticated, async (req, res) => {
  */
 router.get('/currency/:name', isAuthenticated, async (req, res) => {
     try {
+        await apiKeyUsageService.isUserCanRequest(req.user.id);
         const currencyName = req.params.name;
-
         let restCountries;
         
         try {
@@ -638,8 +641,8 @@ router.get('/currency/:name', isAuthenticated, async (req, res) => {
  */
 router.get('/capital/:name', isAuthenticated, async (req, res) => {
     try {
+        await apiKeyUsageService.isUserCanRequest(req.user.id);
         const capitalName = req.params.name;
-
         let restCountries;
         
         try {
@@ -812,8 +815,8 @@ router.get('/capital/:name', isAuthenticated, async (req, res) => {
  */
 router.get('/lang/:name', isAuthenticated, async (req, res) => {
     try {
+        await apiKeyUsageService.isUserCanRequest(req.user.id);
         const langName = req.params.name;
-
         let restCountries;
         
         try {
@@ -981,8 +984,8 @@ router.get('/lang/:name', isAuthenticated, async (req, res) => {
  */
 router.get('/flag/:name', isAuthenticated, async (req, res) => {
     try {
+        await apiKeyUsageService.isUserCanRequest(req.user.id);
         const countryName = req.params.name;
-
         let restCountries;
         
         try {
@@ -1158,8 +1161,8 @@ router.get('/flag/:name', isAuthenticated, async (req, res) => {
  */
 router.get('/region/:name', isAuthenticated, async (req, res) => {
     try {
+        await apiKeyUsageService.isUserCanRequest(req.user.id);
         const regionName = req.params.name;
-
         let restCountries;
         
         try {
@@ -1335,8 +1338,8 @@ router.get('/region/:name', isAuthenticated, async (req, res) => {
  */
 router.get('/subregions/:name', isAuthenticated, async (req, res) => {
     try {
+        await apiKeyUsageService.isUserCanRequest(req.user.id);
         const subregionsName = req.params.name;
-
         let restCountries;
         
         try {
@@ -1512,8 +1515,8 @@ router.get('/subregions/:name', isAuthenticated, async (req, res) => {
  */
 router.get('/translation/:name', isAuthenticated, async (req, res) => {
     try {
+        await apiKeyUsageService.isUserCanRequest(req.user.id);
         const translationName = req.params.name;
-
         let restCountries;
         
         try {

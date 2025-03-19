@@ -6,6 +6,7 @@ import ErrorLogService from "../../services/ErrorLogService.mjs";
 import ApiKeyErrors from "../errors/ApiKeyErrors.mjs";
 import CacheStoreErrors from "../errors/CacheStoreErrors.mjs";
 import RestCountryErrors from "../errors/RestCountryErrors.mjs";
+import ApiKeyUsageError from "../errors/ApiKeyUsageError.mjs";
 import { LogTypes } from "../types/LogTypes.mjs";
 import { log } from "../ConsoleLog.mjs";
 import dotenv from 'dotenv';
@@ -106,6 +107,14 @@ async function ErrorResponse(error, res, location = null, data = null) {
                     error.message,
                     null,
                     "You have reached the maximum number of API keys allowed. Please delete an existing key or contact support."
+                ));
+
+            case ApiKeyUsageError.API_KEY_REQUEST_LIMIT_EXCERDED:
+                return res.status(429).send(StandardResponse(
+                    false,
+                    error.message,
+                    null,
+                    "You have reached the maximum number of API keys request limit. Please try again later."
                 ));
             
             case HashErrors.HASHING_FAILED:
