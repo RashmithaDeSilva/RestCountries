@@ -37,10 +37,14 @@ class ApiKeyUsageDAO {
     }
 
     // Update api key usage
-    async updateApiKeyUsage() {
+    async updateApiKeyUsage(userId) {
         try {
+            await pool.query(`
+                UPDATE api_key_usage 
+                SET key_usage = key_usage + 1 
+                WHERE user_id = ?;
+            `, [userId]);
             
-
         } catch (error) {
             throw error;
         }

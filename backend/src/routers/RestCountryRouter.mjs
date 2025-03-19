@@ -144,6 +144,8 @@ router.get('/', isAuthenticated, async (req, res) => {
             restCountries = await response.json();
         }
 
+        // Update api key usage
+        await apiKeyUsageService.updateApiKeyUsage(req.user.id);
         return res.status(200).send(StandardResponse(
             true,
             "Rest countries all",
@@ -293,6 +295,7 @@ router.get('/', isAuthenticated, async (req, res) => {
  */
 router.get('/name/:name', isAuthenticated, async (req, res) => {
     try {
+        // Check if user have request limit
         await apiKeyUsageService.isUserCanRequest(req.user.id);
         const countryName = req.params.name;
         let restCountries;
@@ -318,6 +321,8 @@ router.get('/name/:name', isAuthenticated, async (req, res) => {
             restCountries = await response.json();
         }
 
+        // Update api key usage
+        await apiKeyUsageService.updateApiKeyUsage(req.user.id);
         return res.status(200).send(StandardResponse(
             true,
             `Rest country with name: ${ countryName }`,
@@ -467,6 +472,7 @@ router.get('/name/:name', isAuthenticated, async (req, res) => {
  */
 router.get('/currency/:name', isAuthenticated, async (req, res) => {
     try {
+        // Check if user have request limit
         await apiKeyUsageService.isUserCanRequest(req.user.id);
         const currencyName = req.params.name;
         let restCountries;
@@ -492,6 +498,8 @@ router.get('/currency/:name', isAuthenticated, async (req, res) => {
             restCountries = await response.json();
         }
 
+        // Update api key usage
+        await apiKeyUsageService.updateApiKeyUsage(req.user.id);
         return res.status(200).send(StandardResponse(
             true,
             `Rest country with currency: ${ currencyName }`,
@@ -641,6 +649,7 @@ router.get('/currency/:name', isAuthenticated, async (req, res) => {
  */
 router.get('/capital/:name', isAuthenticated, async (req, res) => {
     try {
+        // Check if user have request limit
         await apiKeyUsageService.isUserCanRequest(req.user.id);
         const capitalName = req.params.name;
         let restCountries;
@@ -666,6 +675,8 @@ router.get('/capital/:name', isAuthenticated, async (req, res) => {
             restCountries = await response.json();
         }
 
+        // Update api key usage
+        await apiKeyUsageService.updateApiKeyUsage(req.user.id);
         return res.status(200).send(StandardResponse(
             true,
             `Rest country with capital: ${ capitalName }`,
@@ -815,6 +826,7 @@ router.get('/capital/:name', isAuthenticated, async (req, res) => {
  */
 router.get('/lang/:name', isAuthenticated, async (req, res) => {
     try {
+        // Check if user have request limit
         await apiKeyUsageService.isUserCanRequest(req.user.id);
         const langName = req.params.name;
         let restCountries;
@@ -840,6 +852,8 @@ router.get('/lang/:name', isAuthenticated, async (req, res) => {
             restCountries = await response.json();
         }
 
+        // Update api key usage
+        await apiKeyUsageService.updateApiKeyUsage(req.user.id);
         return res.status(200).send(StandardResponse(
             true,
             `Rest country with languages: ${ langName }`,
@@ -984,6 +998,7 @@ router.get('/lang/:name', isAuthenticated, async (req, res) => {
  */
 router.get('/flag/:name', isAuthenticated, async (req, res) => {
     try {
+        // Check if user have request limit
         await apiKeyUsageService.isUserCanRequest(req.user.id);
         const countryName = req.params.name;
         let restCountries;
@@ -1009,6 +1024,8 @@ router.get('/flag/:name', isAuthenticated, async (req, res) => {
             restCountries = await response.json();
         }
 
+        // Update api key usage
+        await apiKeyUsageService.updateApiKeyUsage(req.user.id);
         return res.status(200).send(StandardResponse(
             true,
             `Rest country with flag: ${ countryName }`,
@@ -1161,6 +1178,7 @@ router.get('/flag/:name', isAuthenticated, async (req, res) => {
  */
 router.get('/region/:name', isAuthenticated, async (req, res) => {
     try {
+        // Check if user have request limit
         await apiKeyUsageService.isUserCanRequest(req.user.id);
         const regionName = req.params.name;
         let restCountries;
@@ -1186,6 +1204,8 @@ router.get('/region/:name', isAuthenticated, async (req, res) => {
             restCountries = await response.json();
         }
 
+        // Update api key usage
+        await apiKeyUsageService.updateApiKeyUsage(req.user.id);
         return res.status(200).send(StandardResponse(
             true,
             `Rest country with region: ${ regionName }`,
@@ -1338,6 +1358,7 @@ router.get('/region/:name', isAuthenticated, async (req, res) => {
  */
 router.get('/subregions/:name', isAuthenticated, async (req, res) => {
     try {
+        // Check if user have request limit
         await apiKeyUsageService.isUserCanRequest(req.user.id);
         const subregionsName = req.params.name;
         let restCountries;
@@ -1363,6 +1384,8 @@ router.get('/subregions/:name', isAuthenticated, async (req, res) => {
             restCountries = await response.json();
         }
 
+        // Update api key usage
+        await apiKeyUsageService.updateApiKeyUsage(req.user.id);
         return res.status(200).send(StandardResponse(
             true,
             `Rest country with subregions: ${ subregionsName }`,
@@ -1515,6 +1538,7 @@ router.get('/subregions/:name', isAuthenticated, async (req, res) => {
  */
 router.get('/translation/:name', isAuthenticated, async (req, res) => {
     try {
+        // Check if user have request limit
         await apiKeyUsageService.isUserCanRequest(req.user.id);
         const translationName = req.params.name;
         let restCountries;
@@ -1540,6 +1564,8 @@ router.get('/translation/:name', isAuthenticated, async (req, res) => {
             restCountries = await response.json();
         }
 
+        // Update api key usage
+        await apiKeyUsageService.updateApiKeyUsage(req.user.id);
         return res.status(200).send(StandardResponse(
             true,
             `Rest country with translation: ${ translationName }`,

@@ -16,6 +16,16 @@ class ApiKeyUsageService {
             throw error;
         }
     }
+
+    // Update api key usage
+    async updateApiKeyUsage(userId) {
+        try {
+            const usageStatus = await this.isUserCanRequest(userId);
+            if (usageStatus) await this.apiKeyUsageDAO.updateApiKeyUsage(userId);
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default ApiKeyUsageService;
