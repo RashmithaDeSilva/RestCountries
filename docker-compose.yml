@@ -31,8 +31,8 @@ services:
 
   node_app:
     build:
-      context: .
-      dockerfile: ./backend/Dockerfile
+      context: ./backend
+      dockerfile: ./dockerfile
     container_name: node_app
     restart: unles-stop
     working_dir: /app
