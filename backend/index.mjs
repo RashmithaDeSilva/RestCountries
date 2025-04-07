@@ -31,6 +31,8 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'wVI7efbx+CV43xplx4!H$a&lUAX2H6jJ)Gb&0NJy$%)V%TNAPaUF=5yHeZ6Sz!I@',
     saveUninitialized: false, // recommended: only save session when data exists
     resave: true, // required: force lightweight session keep alive (touch)
+    httpOnly: true,
+    secure: true,
     cookie: {
         maxAge: Number(process.env.COOKIE_EX_TIME || 86400) * 1000,
         httpOnly: true, // Cookie is not accessible via JavaScript
