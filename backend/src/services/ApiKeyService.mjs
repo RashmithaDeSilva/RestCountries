@@ -147,6 +147,16 @@ class ApiKeyService {
             throw error;
         }
     }
+
+    // Get user by api key
+    async getUserIdByApiKey(apiKey) {
+        try {
+            return await this.apiKeyDAO.getUserIdByApiKey(apiKey);
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default ApiKeyService;

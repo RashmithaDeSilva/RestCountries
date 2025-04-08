@@ -117,6 +117,17 @@ class ApiKeyDAO {
             throw error;
         }
     }
+
+    // Get user by api key
+    async getUserIdByApiKey(apiKey) {
+        try {
+            const [row] = await pool.query(`SELECT user_id FROM api_keys WHERE api_key = ?`, [apiKey]);
+            return row.length === 0 ? null : row[0].user_id;
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default ApiKeyDAO;
