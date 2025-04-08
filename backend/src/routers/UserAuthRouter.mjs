@@ -17,7 +17,7 @@ const userService = new UserService();
 
 /**
  * @swagger
- * /api/v1/auth:
+ * /api/v1/auth/login:
  *   post:
  *     summary: Authenticate user
  *     description: Authenticates a user using email and password, returning a session if successful.
@@ -124,7 +124,7 @@ const userService = new UserService();
  *                   type: string
  *                   example: Internal Server Error
  */
-router.post('/', [
+router.post('/login', [
     checkSchema({
         ...UserValidationSchema.emailValidation(),
         ...UserValidationSchema.passwordValidation(),

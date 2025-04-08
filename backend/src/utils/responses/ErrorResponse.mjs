@@ -7,6 +7,7 @@ import ApiKeyErrors from "../errors/ApiKeyErrors.mjs";
 import CacheStoreErrors from "../errors/CacheStoreErrors.mjs";
 import RestCountryErrors from "../errors/RestCountryErrors.mjs";
 import ApiKeyUsageError from "../errors/ApiKeyUsageError.mjs";
+import CsrfTokenErrors from "../errors/CsrfTokenErrors.mjs";
 import { LogTypes } from "../types/LogTypes.mjs";
 import { log } from "../ConsoleLog.mjs";
 import dotenv from 'dotenv';
@@ -86,6 +87,7 @@ async function ErrorResponse(error, res, location = null, data = null) {
                 ));
     
             case ApiKeyErrors.INVALID_API_KEY:
+            case CsrfTokenErrors.INVALID_CSRF_TOKEN:
                 return res.status(403).send(StandardResponse(
                     false,
                     error.message,
