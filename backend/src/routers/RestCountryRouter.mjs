@@ -14,6 +14,7 @@ const router = Router();
 const cacheStoreService = new CacheStoreService();
 const errorLogService = new ErrorLogService();
 const apiKeyUsageService = new ApiKeyUsageService();
+const DATA_RETRIEVE_API = process.env.DATA_RETRIEVE_API || 'https://restcountries.com/v3.1/all'
 
 /**
  * @swagger
@@ -137,7 +138,7 @@ router.get('/', isAuthenticated, async (req, res) => {
             await errorLogService.createLog('/restcountry/', cacheError);
 
             // If cache fetch fails, fetch from external API
-            const response = await fetch(process.env.DATA_RETRIEVE_API);
+            const response = await fetch( DATA_RETRIEVE_API );
             if (!response.ok) {
                 throw new Error(`${ CacheStoreErrors.FAILED_TO_FETCH_DATA  } (response status: ${ response.statusText })`);
             }
@@ -314,7 +315,7 @@ router.get('/name/:name', isAuthenticated, async (req, res) => {
             await errorLogService.createLog('/restcountry/name', cacheError);
 
             // If cache fetch fails, fetch from external API
-            const response = await fetch(`${process.env.DATA_RETRIEVE_API}/name/${ encodeURIComponent(countryName) }`);
+            const response = await fetch(`${ DATA_RETRIEVE_API }/name/${ encodeURIComponent(countryName) }`);
             if (!response.ok) {
                 throw new Error(`${ CacheStoreErrors.FAILED_TO_FETCH_DATA } (response status: ${ response.statusText })`);
             }
@@ -491,7 +492,7 @@ router.get('/currency/:name', isAuthenticated, async (req, res) => {
             await errorLogService.createLog('/restcountry/currency', cacheError);
 
             // If cache fetch fails, fetch from external API
-            const response = await fetch(`${process.env.DATA_RETRIEVE_API}/currency/${ encodeURIComponent(currencyName) }`);
+            const response = await fetch(`${ DATA_RETRIEVE_API }/currency/${ encodeURIComponent(currencyName) }`);
             if (!response.ok) {
                 throw new Error(`${ CacheStoreErrors.FAILED_TO_FETCH_DATA } (response status: ${ response.statusText })`);
             }
@@ -668,7 +669,7 @@ router.get('/capital/:name', isAuthenticated, async (req, res) => {
             await errorLogService.createLog('/restcountry/capital', cacheError);
 
             // If cache fetch fails, fetch from external API
-            const response = await fetch(`${process.env.DATA_RETRIEVE_API}/capital/${ encodeURIComponent(capitalName) }`);
+            const response = await fetch(`${ DATA_RETRIEVE_API }/capital/${ encodeURIComponent(capitalName) }`);
             if (!response.ok) {
                 throw new Error(`${ CacheStoreErrors.FAILED_TO_FETCH_DATA } (response status: ${ response.statusText })`);
             }
@@ -845,7 +846,7 @@ router.get('/lang/:name', isAuthenticated, async (req, res) => {
             await errorLogService.createLog('/restcountry/lang', cacheError);
 
             // If cache fetch fails, fetch from external API
-            const response = await fetch(`${process.env.DATA_RETRIEVE_API}/lang/${ encodeURIComponent(langName) }`);
+            const response = await fetch(`${ DATA_RETRIEVE_API }/lang/${ encodeURIComponent(langName) }`);
             if (!response.ok) {
                 throw new Error(`${ CacheStoreErrors.FAILED_TO_FETCH_DATA } (response status: ${ response.statusText })`);
             }
@@ -1017,7 +1018,7 @@ router.get('/flag/:name', isAuthenticated, async (req, res) => {
             await errorLogService.createLog('/restcountry/flag', cacheError);
 
             // If cache fetch fails, fetch from external API
-            const response = await fetch(`${process.env.DATA_RETRIEVE_API}/flag/${ encodeURIComponent(countryName) }`);
+            const response = await fetch(`${ DATA_RETRIEVE_API }/flag/${ encodeURIComponent(countryName) }`);
             if (!response.ok) {
                 throw new Error(`${ CacheStoreErrors.FAILED_TO_FETCH_DATA } (response status: ${ response.statusText })`);
             }
@@ -1197,7 +1198,7 @@ router.get('/region/:name', isAuthenticated, async (req, res) => {
             await errorLogService.createLog('/restcountry/region', cacheError);
 
             // If cache fetch fails, fetch from external API
-            const response = await fetch(`${process.env.DATA_RETRIEVE_API}/region/${ encodeURIComponent(regionName) }`);
+            const response = await fetch(`${ DATA_RETRIEVE_API }/region/${ encodeURIComponent(regionName) }`);
             if (!response.ok) {
                 throw new Error(`${ CacheStoreErrors.FAILED_TO_FETCH_DATA } (response status: ${ response.statusText })`);
             }
@@ -1377,7 +1378,7 @@ router.get('/subregions/:name', isAuthenticated, async (req, res) => {
             await errorLogService.createLog('/restcountry/subregions', cacheError);
 
             // If cache fetch fails, fetch from external API
-            const response = await fetch(`${process.env.DATA_RETRIEVE_API}/subregions/${ encodeURIComponent(subregionsName) }`);
+            const response = await fetch(`${ DATA_RETRIEVE_API }/subregions/${ encodeURIComponent(subregionsName) }`);
             if (!response.ok) {
                 throw new Error(`${ CacheStoreErrors.FAILED_TO_FETCH_DATA } (response status: ${ response.statusText })`);
             }
@@ -1557,7 +1558,7 @@ router.get('/translation/:name', isAuthenticated, async (req, res) => {
             await errorLogService.createLog('/restcountry/translation', cacheError);
 
             // If cache fetch fails, fetch from external API
-            const response = await fetch(`${process.env.DATA_RETRIEVE_API}/translation/${ encodeURIComponent(translationName) }`);
+            const response = await fetch(`${ DATA_RETRIEVE_API }/translation/${ encodeURIComponent(translationName) }`);
             if (!response.ok) {
                 throw new Error(`${ CacheStoreErrors.FAILED_TO_FETCH_DATA } (response status: ${ response.statusText })`);
             }

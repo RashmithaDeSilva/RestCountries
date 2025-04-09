@@ -179,7 +179,7 @@ router.post('/login', [
 
 /**
  * @swagger
- * /api/v1/auth/logout:
+ * /api/v1/auth/admin/logout:
  *   post:
  *     summary: Log out the admin
  *     description: Ends the admin session and logs the user out.
