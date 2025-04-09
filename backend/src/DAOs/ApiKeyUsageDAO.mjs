@@ -31,7 +31,6 @@ class ApiKeyUsageDAO {
             return row[0].status > 0;
 
         } catch (error) {
-            console.log(error);
             throw error;
         }
     }

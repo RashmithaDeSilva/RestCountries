@@ -1,7 +1,7 @@
 import ErrorLogDAO from '../DAOs/ErrorLogDAO.mjs';
 import ErrorLogModel from '../models/ErrorLogModel.mjs';
 import { log } from '../utils/ConsoleLog.mjs';
-import { LogTypes } from '../utils/types/LogTypes.mjs';
+import { LogTypes } from '../utils/enums/LogTypes.mjs';
 
 class ErrorLogService {
     constructor() {

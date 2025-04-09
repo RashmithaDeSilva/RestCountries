@@ -7,7 +7,7 @@ import passport from 'passport';
 import './src/strategies/local-strategy.mjs';
 import redisSessionStore from './src/stores/SessionStore.mjs';
 import cacheStoreUpdate from './src/utils/CacheStoreUpdate.mjs';
-import { LogTypes } from './src/utils/types/LogTypes.mjs';
+import { LogTypes } from './src/utils/enums/LogTypes.mjs';
 import { log } from './src/utils/ConsoleLog.mjs';
 import cookieParser from 'cookie-parser';
 import tinyCsrf from 'tiny-csrf';
@@ -61,6 +61,7 @@ app.use(tinyCsrf(
     // URL paths to exclude from CSRF protection
     [
         `/api/${ API_VERSION }/status`,
+        `/api/${ API_VERSION }/auth/admin/login`,
         `/api/${ API_VERSION }/auth/login`,
         `/api/${ API_VERSION }/auth/register`,
         `/api/${ API_VERSION }/auth/restcountry`

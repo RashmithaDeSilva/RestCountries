@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import dotenv from 'dotenv';
 import StandardResponse from '../utils/responses/StandardResponse.mjs';
-import isAuthenticated from '../middlewares/AuthMiddleware.mjs';
+import isAuthenticated from '../middlewares/UserAuthMiddleware.mjs';
 import ApiKeyService from '../services/ApiKeyService.mjs';
 import { validationResult, matchedData, checkSchema } from 'express-validator';
 import ApiKeyValidationSchema from '../utils/validations/ApiKeyValidationSchema.mjs';

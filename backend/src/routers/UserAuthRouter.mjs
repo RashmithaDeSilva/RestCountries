@@ -8,7 +8,7 @@ import DatabaseErrors from '../utils/errors/DatabaseErrors.mjs';
 import passport from 'passport';
 import CommonErrors from '../utils/errors/CommonErrors.mjs';
 import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
-import isAuthenticated from '../middlewares/AuthMiddleware.mjs';
+import isAuthenticated from '../middlewares/UserAuthMiddleware.mjs';
 import { promisify } from 'util';
 
 dotenv.config();
@@ -137,9 +137,9 @@ router.post('/login', [
         next();
     },
     async (req, res, next) => {
-        passport.authenticate('local', async (error, user) => {
+        passport.authenticate('local-user', async (error, user) => {
             if (error) {
-                return await ErrorResponse(error, res, '/auth/');
+                return await ErrorResponse(error, res, '/auth/login');
             }
             if (!user) {
                 return await ErrorResponse(new Error(DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD), res);
