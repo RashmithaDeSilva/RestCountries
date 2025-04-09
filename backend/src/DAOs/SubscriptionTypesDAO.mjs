@@ -16,7 +16,7 @@ class SubscriptionTypesDAO {
             if (row.length > 0) {
                 const subscriptionTypeModelSet = [];
 
-                for (i=0; i<row.length; i++) {
+                for (let i=0; i<row.length; i++) {
                     subscriptionTypeModelSet.push(new SubscriptionTypeModel(
                         row[i].id,
                         row[i].subscription_name,

@@ -9,6 +9,7 @@ import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
 import CommonErrors from '../utils/errors/CommonErrors.mjs';
 import ApiKeyRouter from './ApiKeyRouter.mjs';
 import RestCountryRouter from './RestCountryRouter.mjs';
+import SubscriptionTypeRouter from './SubscriptionTypeRouter.mjs';
 
 dotenv.config();
 const router = Router();
@@ -18,6 +19,7 @@ router.use('/auth/', UserAuthRouter);
 router.use('/auth/user', UserRouter);
 router.use('/auth/user/apikey', ApiKeyRouter);
 router.use('/auth/restcountry', RestCountryRouter);
+router.use(SubscriptionTypeRouter);
 const API_VERSION = process.env.API_VERSION || 'v1';
 
 /**

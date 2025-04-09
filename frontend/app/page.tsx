@@ -1,103 +1,136 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import "./globals.css";
+
+const Globe = dynamic(() => import("react-globe.gl"), { ssr: false });
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+  const [scrollY, setScrollY] = useState(0);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    // Set initial window size
+    setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+
+    // Listen for window resize to dynamically adjust globe size
+    const handleResize = () => {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+
+    // Listen for scroll event to track scroll position
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("scroll", handleScroll);
+
+    // Cleanup event listeners on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/allSubscriptionTypes")
+      .then(res => res.json())
+      .then(data => setSubscriptions(data.data || []));
+  }, []);
+
+  // Calculate zoom level based on scroll position (scale the zoom level as per scroll)
+  const globeZoom = Math.max(1, 3 - scrollY / 300);
+
+  // Scroll down to the next section
+  const handleScrollDown = () => {
+    const nextSection = document.getElementById("nextSection");
+    if (nextSection) {
+      nextSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  return (
+    <main className="text-white bg-gradient-to-br from-green-500 to-black relative overflow-hidden">
+      {/* Login/Signup Buttons */}
+      <div className="fixed top-4 right-4 z-50 space-x-4">
+        <button className="bg-lime-500 hover:bg-lime-400 px-4 py-2 rounded-lg font-semibold">Login</button>
+        <button className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-semibold">Sign Up</button>
+      </div>
+
+      {/* Globe Section */}
+      <section className="h-screen w-full flex items-center justify-center relative overflow-hidden">
+        {windowSize.width > 0 && (
+          <Globe
+            globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
+            backgroundColor="rgba(0,0,0,0)"
+            width={windowSize.width}
+            height={windowSize.height}
+            globeRadius={globeZoom}
+          />
+        )}
+
+        {/* Website Name Above the Globe */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-9xl font-extrabold z-50 text-center">
+          Rest Countries
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        {/* Scroll Down Button (side with arrow) */}
+        <button
+          onClick={handleScrollDown}
+          className="absolute bottom-10 right-10 bg-transparent text-white text-3xl font-bold hover:text-green-500 transition-colors z-50"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          ↓
+        </button>
+      </section>
+
+      {/* Services Section */}
+      <section
+        id="nextSection"
+        className="snap-start min-h-screen px-8 py-20 bg-black text-white flex items-center justify-center opacity-0 transform translate-y-20 transition-all duration-700"
+        style={{
+          opacity: scrollY > windowSize.height * 0.5 ? 1 : 0,
+          transform: scrollY > windowSize.height * 0.5 ? "translateY(0)" : "translateY(20px)"
+        }}
+      >
+        <div className="text-center space-y-8">
+          <h2 className="text-6xl font-bold text-lime-400 glow">Our Services</h2>
+          <div className="text-3xl text-gray-300">
+            <p className="mb-4">Retrieve all countries, Filter by Name, Currency, Capital, Language</p>
+            <p className="mb-4">Access Flags, Region, Subregion, Get Translations & System Details</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Plans Section */}
+      <section
+        className="snap-start min-h-screen px-8 py-20 bg-gradient-to-br from-black to-blue-900 opacity-0 transform translate-y-20 transition-all duration-700"
+        style={{
+          opacity: scrollY > windowSize.height * 1.5 ? 1 : 0,
+          transform: scrollY > windowSize.height * 1.5 ? "translateY(0)" : "translateY(20px)"
+        }}
+      >
+        <h2 className="text-6xl font-bold mb-10 text-blue-400 text-center">Plans & Packages</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16 justify-center">
+          {subscriptions.map((plan) => (
+            <div
+              key={plan.id}
+              className="border border-gray-600 rounded-2xl p-12 bg-black/70 shadow-2xl hover:scale-105 transition-transform transform"
+            >
+              <h3 className="text-4xl font-semibold text-lime-300">{plan.subscriptionName}</h3>
+              <p className="text-lg text-gray-400">{plan.description}</p>
+              <p className="mt-4 text-3xl text-white">
+                ${plan.subscriptionPrice} {plan.subscriptionPriceCurrency}
+              </p>
+              <p className="text-lg mt-2">API Limit: {plan.apiRequestLimit === -1 ? 'Unlimited' : plan.apiRequestLimit}</p>
+              <p className="text-lg">API Keys: {plan.apiKeyLimit}</p>
+              <p className="mt-4 text-gray-400 text-sm italic">{plan.functionDescription}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </main>
   );
 }
