@@ -1,7 +1,7 @@
 import sqlite3 from "sqlite3";
 import mysql2 from "mysql2/promise";
 import dotenv from "dotenv";
-import { LogTypes } from "../utils/types/LogTypes.mjs";
+import { LogTypes } from "../utils/enums/LogTypes.mjs";
 import { log } from "../utils/ConsoleLog.mjs";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";

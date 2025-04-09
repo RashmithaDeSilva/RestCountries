@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import dotenv from 'dotenv';
 import StandardResponse from '../utils/responses/StandardResponse.mjs';
+import AdminAuthRouter from './AdminAuthRouter.mjs';
 import UserAuthRouter from './UserAuthRouter.mjs';
 import UserRouter from './UserRouter.mjs';
 import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
@@ -10,6 +11,7 @@ import RestCountryRouter from './RestCountryRouter.mjs';
 
 dotenv.config();
 const router = Router();
+router.use('/auth/admin/', AdminAuthRouter);
 router.use('/auth/', UserAuthRouter);
 router.use('/auth/user', UserRouter);
 router.use('/auth/user/apikey', ApiKeyRouter);

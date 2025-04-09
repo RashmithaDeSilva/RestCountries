@@ -1,6 +1,6 @@
 import { RedisStore } from "connect-redis"
 import redisClient from "../config/RedisCon.mjs";
-import { LogTypes } from "../utils/types/LogTypes.mjs";
+import { LogTypes } from "../utils/enums/LogTypes.mjs";
 import { log } from "../utils/ConsoleLog.mjs";
 
 // Initialize store.

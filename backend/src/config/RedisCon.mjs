@@ -1,6 +1,6 @@
 import { createClient } from "redis"
 import dotenv from "dotenv";
-import { LogTypes } from "../utils/types/LogTypes.mjs";
+import { LogTypes } from "../utils/enums/LogTypes.mjs";
 import { log } from "../utils/ConsoleLog.mjs";
 
 dotenv.config();

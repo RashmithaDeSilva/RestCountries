@@ -8,7 +8,7 @@ import CacheStoreErrors from "../errors/CacheStoreErrors.mjs";
 import RestCountryErrors from "../errors/RestCountryErrors.mjs";
 import ApiKeyUsageError from "../errors/ApiKeyUsageError.mjs";
 import CsrfTokenErrors from "../errors/CsrfTokenErrors.mjs";
-import { LogTypes } from "../types/LogTypes.mjs";
+import { LogTypes } from "../enums/LogTypes.mjs";
 import { log } from "../ConsoleLog.mjs";
 import dotenv from 'dotenv';
 
@@ -38,16 +38,7 @@ async function ErrorResponse(error, res, location = null, data = null) {
                     null,
                     data
                 ));
-    
-            case CommonErrors.AUTHENTICATION_FAILED:
-            case ApiKeyErrors.INVALID_API_KEY:
-                return res.status(401).send(StandardResponse(
-                    false,
-                    error.message,
-                    null,
-                    { redirect: `/api/${ API_VERSION }/auth` }
-                ));
-    
+            
             case DatabaseErrors.EMAIL_ALREADY_EXISTS:
             case DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD:
             case DatabaseErrors.INVALID_EMAIL_ADDRESS:
@@ -60,35 +51,46 @@ async function ErrorResponse(error, res, location = null, data = null) {
                     null 
                 ));
     
-            case CommonErrors.NOT_FOUND:
-            case DatabaseErrors.USER_NOT_FOUND:
-                return res.status(404).send(StandardResponse(
+            case CommonErrors.AUTHENTICATION_FAILED:
+            case ApiKeyErrors.INVALID_API_KEY:
+                return res.status(401).send(StandardResponse(
                     false,
                     error.message,
                     null,
                     { redirect: `/api/${ API_VERSION }/auth` }
                 ));
 
-            case RestCountryErrors.COUNTRY_NOT_FOUND:
-                return res.status(404).send(StandardResponse(
+            case DatabaseErrors.OPERATION_CANNOT_BE_PERFORMED:
+            case ApiKeyErrors.INVALID_API_KEY:
+            case CsrfTokenErrors.INVALID_CSRF_TOKEN:
+                return res.status(403).send(StandardResponse(
                     false,
                     error.message,
                     null,
                     null
+                ));
+
+            case DatabaseErrors.ADMIN_NOT_FOUND:
+                return res.status(404).send(StandardResponse(
+                    false,
+                    error.message,
+                    null,
+                    { redirect: `/api/${ API_VERSION }/auth/admin/login` }
+                ));
+    
+            case CommonErrors.NOT_FOUND:
+            case DatabaseErrors.USER_NOT_FOUND:
+                return res.status(404).send(StandardResponse(
+                    false,
+                    error.message,
+                    null,
+                    { redirect: `/api/${ API_VERSION }/auth/login` }
                 ));
     
             case ApiKeyErrors.API_KEY_NAME_YOU_TRY_TO_CHANGE_IS_NOT_EXIST:
             case ApiKeyErrors.API_KEY_NAME_NOT_FOUND:
+            case RestCountryErrors.COUNTRY_NOT_FOUND:
                 return res.status(404).send(StandardResponse(
-                    false,
-                    error.message,
-                    null,
-                    null
-                ));
-    
-            case ApiKeyErrors.INVALID_API_KEY:
-            case CsrfTokenErrors.INVALID_CSRF_TOKEN:
-                return res.status(403).send(StandardResponse(
                     false,
                     error.message,
                     null,

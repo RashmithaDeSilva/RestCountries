@@ -1,18 +1,18 @@
 import dotenv from "dotenv";
 
 dotenv.config();
-const USER_FIRST_NAME_MIN_CHARACTERS_SIZE = process.env.USER_FIRST_NAME_MIN_CHARACTERS_SIZE || 3;
-const USER_FIRST_NAME_MAX_CHARACTERS_SIZE = process.env.USER_FIRST_NAME_MAX_CHARACTERS_SIZE || 50;
-const USER_SURNAME_MIN_CHARACTERS_SIZE = process.env.USER_SURNAME_MIN_CHARACTERS_SIZE || 3;
-const USER_SURNAME_MAX_CHARACTERS_SIZE = process.env.USER_SURNAME_MAX_CHARACTERS_SIZE || 50;
-const USER_EMAIL_MIN_CHARACTERS_SIZE = process.env.USER_EMAIL_MIN_CHARACTERS_SIZE || 10;
-const USER_EMAIL_MAX_CHARACTERS_SIZE = process.env.USER_EMAIL_MAX_CHARACTERS_SIZE || 100;
-const USER_PASSWORD_MIN_CHARACTERS_SIZE = process.env.USER_PASSWORD_MIN_CHARACTERS_SIZE || 12;
+const ADMIN_FIRST_NAME_MIN_CHARACTERS_SIZE = process.env.ADMIN_FIRST_NAME_MIN_CHARACTERS_SIZE || 3;
+const ADMIN_FIRST_NAME_MAX_CHARACTERS_SIZE = process.env.ADMIN_FIRST_NAME_MAX_CHARACTERS_SIZE || 50;
+const ADMIN_SURNAME_MIN_CHARACTERS_SIZE = process.env.ADMIN_SURNAME_MIN_CHARACTERS_SIZE || 3;
+const ADMIN_SURNAME_MAX_CHARACTERS_SIZE = process.env.ADMIN_SURNAME_MAX_CHARACTERS_SIZE || 50;
+const ADMIN_EMAIL_MIN_CHARACTERS_SIZE = process.env.ADMIN_EMAIL_MIN_CHARACTERS_SIZE || 10;
+const ADMIN_EMAIL_MAX_CHARACTERS_SIZE = process.env.ADMIN_EMAIL_MAX_CHARACTERS_SIZE || 100;
+const ADMIN_PASSWORD_MIN_CHARACTERS_SIZE = process.env.ADMIN_PASSWORD_MIN_CHARACTERS_SIZE || 12;
 
 
 
 
-class UserValidationSchema {
+class AdminValidationSchema {
     constructor() {}
 
     static firstNameValidation() {
@@ -36,11 +36,11 @@ class UserValidationSchema {
                 },
                 isLength: {
                     options: {
-                        min: parseInt(USER_FIRST_NAME_MIN_CHARACTERS_SIZE),
-                        max: parseInt(USER_FIRST_NAME_MAX_CHARACTERS_SIZE)
+                        min: parseInt(ADMIN_FIRST_NAME_MIN_CHARACTERS_SIZE),
+                        max: parseInt(ADMIN_FIRST_NAME_MAX_CHARACTERS_SIZE)
                     },
                     errorMessage: {
-                        error: `First name must be between ${ USER_FIRST_NAME_MIN_CHARACTERS_SIZE } and ${ USER_FIRST_NAME_MAX_CHARACTERS_SIZE } characters!`
+                        error: `First name must be between ${ ADMIN_FIRST_NAME_MIN_CHARACTERS_SIZE } and ${ ADMIN_FIRST_NAME_MAX_CHARACTERS_SIZE } characters!`
                     }
                 }
             }
@@ -68,11 +68,11 @@ class UserValidationSchema {
                 },
                 isLength: {
                     options: {
-                        min: parseInt(USER_SURNAME_MIN_CHARACTERS_SIZE),
-                        max: parseInt(USER_SURNAME_MAX_CHARACTERS_SIZE)
+                        min: parseInt(ADMIN_SURNAME_MIN_CHARACTERS_SIZE),
+                        max: parseInt(ADMIN_SURNAME_MAX_CHARACTERS_SIZE)
                     },
                     errorMessage: {
-                        error: `Surname must be between ${ USER_SURNAME_MIN_CHARACTERS_SIZE } and ${ USER_SURNAME_MAX_CHARACTERS_SIZE } characters!`
+                        error: `Surname must be between ${ ADMIN_SURNAME_MIN_CHARACTERS_SIZE } and ${ ADMIN_SURNAME_MAX_CHARACTERS_SIZE } characters!`
                     }
                 }
             }
@@ -94,11 +94,11 @@ class UserValidationSchema {
                 },
                 isLength: {
                     options: {
-                        min: parseInt(USER_EMAIL_MIN_CHARACTERS_SIZE),
-                        max: parseInt(USER_EMAIL_MAX_CHARACTERS_SIZE)
+                        min: parseInt(ADMIN_EMAIL_MIN_CHARACTERS_SIZE),
+                        max: parseInt(ADMIN_EMAIL_MAX_CHARACTERS_SIZE)
                     },
                     errorMessage: {
-                        error: `Email must be between ${ USER_EMAIL_MIN_CHARACTERS_SIZE } and ${ USER_EMAIL_MAX_CHARACTERS_SIZE } characters!`
+                        error: `Email must be between ${ ADMIN_EMAIL_MIN_CHARACTERS_SIZE } and ${ ADMIN_EMAIL_MAX_CHARACTERS_SIZE } characters!`
                     }
                 },
                 isEmail: {
@@ -138,10 +138,10 @@ class UserValidationSchema {
                 },
                 isLength: {
                     options: {
-                        min: parseInt(USER_PASSWORD_MIN_CHARACTERS_SIZE)
+                        min: parseInt(ADMIN_PASSWORD_MIN_CHARACTERS_SIZE)
                     },
                     errorMessage: {
-                        error: `Password must be at least ${ USER_PASSWORD_MIN_CHARACTERS_SIZE } characters!`
+                        error: `Password must be at least ${ ADMIN_PASSWORD_MIN_CHARACTERS_SIZE } characters!`
                     }
                 }
             }
@@ -163,10 +163,10 @@ class UserValidationSchema {
                 },
                 isLength: {
                     options: {
-                        min: parseInt(USER_PASSWORD_MIN_CHARACTERS_SIZE)
+                        min: parseInt(ADMIN_PASSWORD_MIN_CHARACTERS_SIZE)
                     },
                     errorMessage: {
-                        error: `Confirm password must be at least ${ USER_PASSWORD_MIN_CHARACTERS_SIZE } characters!`
+                        error: `Confirm password must be at least ${ ADMIN_PASSWORD_MIN_CHARACTERS_SIZE } characters!`
                     }
                 },
                 custom: {
@@ -194,10 +194,10 @@ class UserValidationSchema {
                 },
                 isLength: {
                     options: {
-                        min: parseInt(USER_PASSWORD_MIN_CHARACTERS_SIZE)
+                        min: parseInt(ADMIN_PASSWORD_MIN_CHARACTERS_SIZE)
                     },
                     errorMessage: {
-                        error: `Old password must be at least ${ USER_PASSWORD_MIN_CHARACTERS_SIZE } characters!`
+                        error: `Old password must be at least ${ ADMIN_PASSWORD_MIN_CHARACTERS_SIZE } characters!`
                     }
                 }
             }
@@ -205,4 +205,4 @@ class UserValidationSchema {
     }
 }
 
-export default UserValidationSchema;
+export default AdminValidationSchema;

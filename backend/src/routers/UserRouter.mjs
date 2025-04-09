@@ -5,7 +5,7 @@ import StandardResponse from '../utils/responses/StandardResponse.mjs';
 import UserValidationSchema from '../utils/validations/UserValidationSchema.mjs';
 import UserService from '../services/UserService.mjs';
 import CommonErrors from '../utils/errors/CommonErrors.mjs';
-import isAuthenticated from '../middlewares/AuthMiddleware.mjs';
+import isAuthenticated from '../middlewares/UserAuthMiddleware.mjs';
 
 dotenv.config();
 const router = Router();

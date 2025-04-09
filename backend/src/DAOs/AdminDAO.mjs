@@ -1,19 +1,19 @@
 import { getDatabasePool } from '../config/SQLCon.mjs';
-import UserModel from '../models/UserModel.mjs';
+import AdminModel from '../models/AdminModel.mjs';
 import DatabaseErrors from '../utils/errors/DatabaseErrors.mjs';
 import dotenv from 'dotenv';
 
 dotenv.config();
 const pool = await getDatabasePool();
 
-class UserDAO {
+class AdminDAO {
     constructor () {
     }
 
     // Check email is exist
     async checkEmailIsExist(email) {
         try {
-            const [row] = await pool.query("SELECT email FROM users WHERE email = ?", [email]);
+            const [row] = await pool.query("SELECT email FROM admins WHERE email = ?", [email]);
             return row.length > 0;
 
         } catch (error) {
@@ -24,7 +24,7 @@ class UserDAO {
     // Check id is exist
     async checkIdIsExist(id) {
         try {
-            const [row] = await pool.query("SELECT id FROM users WHERE id = ?", [id]);
+            const [row] = await pool.query("SELECT id FROM admins WHERE id = ?", [id]);
             return row.length > 0;
 
         } catch (error) {
@@ -32,10 +32,10 @@ class UserDAO {
         }
     }
 
-    // Get user ID using email
-    async getUserIdByEmail(email) {
+    // Get admins ID using email
+    async getAdminIdByEmail(email) {
         try {
-            const [row] = await pool.query("SELECT id FROM users WHERE email = ?", [email]);
+            const [row] = await pool.query("SELECT id FROM admins WHERE email = ?", [email]);
             if (row.length > 0) {
                 return row[0].id;
             }
@@ -45,25 +45,26 @@ class UserDAO {
         }
     }
 
-    // Create user
-    async create(user) {
+    // Create admins
+    async create(admin) {
         try {
             // Check email is exist
-            if (await this.checkEmailIsExist(user.email)) throw new Error(DatabaseErrors.EMAIL_ALREADY_EXISTS);
+            if (await this.checkEmailIsExist(admin.email)) throw new Error(DatabaseErrors.EMAIL_ALREADY_EXISTS);
             
             const [result] = await pool.query(`
-                INSERT INTO users (
+                INSERT INTO admins (
                     first_name, 
                     surname, 
                     email, 
                     contact_number, 
-                    password_hash
-                ) values (?, ?, ?, ?, ?)
-            `, [user.firstName, user.surname, user.email, user.contactNumber, user.passwordHash]);
+                    password_hash,
+                    roll
+                ) values (?, ?, ?, ?, ?, ?)
+            `, [admin.firstName, admin.surname, admin.email, admin.contactNumber, admin.passwordHash, admin.roll]);
 
-            const userId = process.env.ENV === "PROD" ? 
-            result.insertId : await this.getUserIdByEmail(user.email);
-            return userId;
+            const adminId = process.env.ENV === "PROD" ? 
+            result.insertId : await this.getAdminIdByEmail(admin.email);
+            return adminId;
 
         } catch (error) {
             throw error;
@@ -76,7 +77,7 @@ class UserDAO {
             // Check email is exist
             if (!await this.checkEmailIsExist(email)) throw new Error(DatabaseErrors.INVALID_EMAIL_ADDRESS_OR_PASSWORD);
 
-            const [row] = await pool.query(`SELECT password_hash FROM users WHERE email = ?`, [email]);
+            const [row] = await pool.query(`SELECT password_hash FROM admins WHERE email = ?`, [email]);
             return row[0].password_hash;
 
         } catch (error) {
@@ -90,7 +91,7 @@ class UserDAO {
             // Check id is exist
             if (!await this.checkIdIsExist(id)) throw new Error(DatabaseErrors.USER_NOT_FOUND);
 
-            const [row] = await pool.query(`SELECT password_hash FROM users WHERE id = ?`, [id]);
+            const [row] = await pool.query(`SELECT password_hash FROM admins WHERE id = ?`, [id]);
             return row[0].password_hash;
 
         } catch (error) {
@@ -98,21 +99,21 @@ class UserDAO {
         }
     }
 
-    // Get user using email
-    async getUserByEmail(email) {
+    // Get admin using email
+    async getAdminByEmail(email) {
         try {
             // Check email is exist
             if (!await this.checkEmailIsExist(email)) throw new Error(DatabaseErrors.INVALID_EMAIL_ADDRESS);
             
-            const [row] = await pool.query(`SELECT * FROM users WHERE email = ?`, [email]);
-            return new UserModel(
+            const [row] = await pool.query(`SELECT * FROM admins WHERE email = ?`, [email]);
+            return new AdminModel(
                 row[0].first_name, 
                 row[0].surname,
                 row[0].email,
                 row[0].contact_number,
+                row[0].roll,
                 row[0].password_hash,
                 row[0].id,
-                row[0].verify,
             );
 
         } catch (error) {
@@ -120,18 +121,18 @@ class UserDAO {
         }
     }
 
-    // Get user using id
-    async getUserById(id) {
+    // Get admin using id
+    async getAdminById(id) {
         try {
-            const [row] = await pool.query(`SELECT * FROM users WHERE id = ?`, [id]);
-            return row.length === 0 ? null : new UserModel(
+            const [row] = await pool.query(`SELECT * FROM admins WHERE id = ?`, [id]);
+            return row.length === 0 ? null : new AdminModel(
                 row[0].first_name, 
                 row[0].surname,
                 row[0].email,
                 row[0].contact_number,
+                row[0].roll,
                 row[0].password_hash,
                 row[0].id,
-                row[0].verify,
             );
 
         } catch (error) {
@@ -139,18 +140,18 @@ class UserDAO {
         }
     }
 
-    // Update user
-    async update(user) {
+    // Update admin
+    async update(admin) {
         try {
             // Check email is exist
-            const id = await this.getUserIdByEmail(user.email);
-            if (id !== null && id !== user.id) throw new Error(DatabaseErrors.EMAIL_ALREADY_EXISTS);
+            const id = await this.getAdminsIdByEmail(admin.email);
+            if (id !== null && id !== admin.id) throw new Error(DatabaseErrors.EMAIL_ALREADY_EXISTS);
             
             await pool.query(`
-                UPDATE users 
-                SET first_name = ?, surname = ?, email = ?, contact_number = ?
+                UPDATE admins 
+                SET first_name = ?, surname = ?, email = ?, contact_number = ?, roll = ?
                 WHERE id = ?
-            `, [user.firstName, user.surname, user.email, user.contactNumber, user.id]);
+            `, [admin.firstName, admin.surname, admin.email, admin.contactNumber, admin.id]);
 
         } catch (error) {
             throw error;
@@ -161,7 +162,7 @@ class UserDAO {
     async changePassword(id, hashPassword) {
         try {
             await pool.query(`
-                UPDATE users 
+                UPDATE admins 
                 SET password_hash = ?
                 WHERE id = ?
             `, [hashPassword, id]);
@@ -170,6 +171,17 @@ class UserDAO {
             throw error;
         }
     }
+
+    // Remove admin
+    async removeAdmin(id) {
+        try {
+            if (id === 1) throw new Error(DatabaseErrors.OPERATION_CANNOT_BE_PERFORMED);
+            await pool.query(`DELETE FROM admins WHERE id = ?`, [id]);
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
-export default UserDAO;
+export default AdminDAO;

@@ -17,7 +17,7 @@ class UserModel {
 
     // Creating response model with id
     static getResponseUserModel(firstName, surname, email, contactNumber, verify, id) {
-        return new UserModel(firstName, surname, email, contactNumber, verify, id);
+        return new UserModel(firstName, surname, email, contactNumber, null, id, verify);
     }
 }
 

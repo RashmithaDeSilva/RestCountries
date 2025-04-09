@@ -3,7 +3,7 @@ import CacheStoreErrors from './errors/CacheStoreErrors.mjs';
 import CacheStoreService from '../services/CacheStoreService.mjs';
 import CacheStoreModel from '../models/CacheStoreModel.mjs';
 import ErrorLogService from '../services/ErrorLogService.mjs';
-import { LogTypes } from './types/LogTypes.mjs';
+import { LogTypes } from './enums/LogTypes.mjs';
 import { log } from './ConsoleLog.mjs';
 import { readFileSync } from 'fs';
 import dotenv from 'dotenv';
