@@ -58,6 +58,17 @@ class SubscriptionTypesDAO {
             throw error;
         }
     }
+
+    // Get subscription types count
+    async getSubscriptionTypesCount() {
+        try {
+            const [row] = await pool.query(`SELECT COUNT(*) AS count FROM subscription_types`);
+            return row[0].count;
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default SubscriptionTypesDAO;

@@ -182,6 +182,17 @@ class AdminDAO {
             throw error;
         }
     }
+
+    // Admin count
+    async getAdminCount() {
+        try {
+            const [row] = await pool.query(`SELECT COUNT(*) AS count FROM admins`);
+            return row[0].count;
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default AdminDAO;

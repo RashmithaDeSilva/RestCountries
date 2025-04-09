@@ -131,6 +131,52 @@ class CacheStoreDAO {
             throw error;
         }
     }
+
+    // Get online users and admins based on unique sessions
+    async getOnlineAdminsAndUsersBySesions() {
+        try {
+            let cursor = 0;
+            const userIds = new Set();
+            const adminIds = new Set();
+
+            do {
+                const result = await redisClient.scan(cursor, {
+                    MATCH: 'session:*',
+                    COUNT: 100,
+                });
+
+                cursor = Number(result.cursor);
+
+                if (result.keys.length === 0) continue;
+
+                const sessionDataList = await Promise.all(
+                    result.keys.map(async (key) => {
+                        const keyData = await redisClient.get(key);
+                        if (keyData) {
+                            const parsed = JSON.parse(keyData);
+                            const user = parsed?.passport?.user;
+                            if (user?.id && user?.roll) {
+                                if (user.roll === "USER") {
+                                    userIds.add(user.id); // Add to Set (unique)
+                                } else {
+                                    adminIds.add(user.id);
+                                }
+                            }
+                        }
+                    })
+                );
+
+            } while (cursor !== 0);
+
+            return {
+                adminsCount: adminIds.size,
+                usersCount: userIds.size,
+            };
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default CacheStoreDAO;
