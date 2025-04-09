@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import "./globals.css";
+import Link from "next/link";
 
 const Globe = dynamic(() => import("react-globe.gl"), { ssr: false });
 
@@ -56,9 +57,20 @@ export default function Home() {
     <main className="text-white bg-gradient-to-br from-green-500 to-black relative overflow-hidden">
       {/* Login/Signup Buttons */}
       <div className="fixed top-4 right-4 z-50 space-x-4">
-        <button className="bg-lime-500 hover:bg-lime-400 px-4 py-2 rounded-lg font-semibold">Login</button>
-        <button className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-semibold">Sign Up</button>
-      </div>
+        {/* Login Button */}
+        <Link href="/login">
+          <button className="bg-lime-500 hover:bg-lime-400 px-4 py-2 rounded-lg font-semibold">
+            Login
+          </button>
+        </Link>
+
+        {/* Sign Up Button */}
+        <Link href="/signup">
+          <button className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-semibold">
+            Sign Up
+          </button>
+        </Link>
+    </div>
 
       {/* Globe Section */}
       <section className="h-screen w-full flex items-center justify-center relative overflow-hidden">
