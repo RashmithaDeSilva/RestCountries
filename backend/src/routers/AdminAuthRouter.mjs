@@ -185,6 +185,19 @@ router.post('/login', [
  *     description: Ends the admin session and logs the user out.
  *     tags:
  *       - Admin Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - _csrf
+ *             properties:
+ *               _csrf:
+ *                 type: string
+ *                 example: 499ac55a-721c-4020-9b19-3fde89f27689
+ *                 description: CSRF token
  *     security:
  *       - cookieAuth: []
  *     responses:
@@ -229,6 +242,27 @@ router.post('/login', [
  *                 errors:
  *                   type: object
  *                   example: { "redirect": "/api/v1/auth" }
+ *       403:
+ *         description: Forbidden - Invalid or missing CSRF token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Invalid CSRF token
+ *                 data:
+ *                   type: string
+ *                   nullable: true
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   nullable: true
+ *                   example: null
  *       500:
  *         description: Internal server error
  *         content:
@@ -250,6 +284,7 @@ router.post('/login', [
  *                   type: string
  *                   nullable: true
  *                   example: null
+ *
  * components:
  *   securitySchemes:
  *     cookieAuth:
