@@ -19,7 +19,6 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
             dashboard,
             null
         ));
-        return res.status(200).send(x);
         
     } catch (error) {
         console.log(error);
