@@ -170,6 +170,17 @@ class UserDAO {
             throw error;
         }
     }
+
+    // User count
+    async getUsersCount() {
+        try {
+            const [row] = await pool.query(`SELECT COUNT(*) AS count FROM users`);
+            return row[0].count;
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default UserDAO;

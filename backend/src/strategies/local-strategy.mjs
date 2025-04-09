@@ -4,6 +4,7 @@ import AdminService from "../services/AdminService.mjs";
 import UserService from "../services/UserService.mjs";
 import DatabaseErrors from "../utils/errors/DatabaseErrors.mjs";
 import CommonErrors from "../utils/errors/CommonErrors.mjs";
+import AdminModel from "../models/AdminModel.mjs";
 import UserModel from "../models/UserModel.mjs";
 
 const adminService = new AdminService();
@@ -20,17 +21,29 @@ passport.serializeUser((userOrAdmin, done) => {
 // Take data from session
 passport.deserializeUser(async (sessionData, done) => {
     try {
-        const user = await userService.getUserById(sessionData.id);
-        const responseUserModel = UserModel.getResponseUserModel(
-            user.firstName, 
-            user.surname,
-            user.email,
-            user.contactNumber,
-            user.verify,
-            user.id
+        const userOrAdmin = sessionData.roll !== "USER" ? 
+        await adminService.getAdminById(sessionData.id) : 
+        await userService.getUserById(sessionData.id);
+
+        const responseModel = userOrAdmin?.roll ? 
+        AdminModel.getResponseAdminModel(
+            userOrAdmin.firstName, 
+            userOrAdmin.surname,
+            userOrAdmin.email,
+            userOrAdmin.contactNumber,
+            userOrAdmin.roll,
+            userOrAdmin.id
+        ) : 
+        UserModel.getResponseUserModel(
+            userOrAdmin.firstName, 
+            userOrAdmin.surname,
+            userOrAdmin.email,
+            userOrAdmin.contactNumber,
+            userOrAdmin.verify,
+            userOrAdmin.id
         );
-        if (!user) throw new Error(DatabaseErrors.USER_NOT_FOUND);
-        done(null, responseUserModel);
+        if (!userOrAdmin) throw new Error(DatabaseErrors.USER_NOT_FOUND);
+        done(null, responseModel);
 
     } catch (error) {
         done(error, false);

@@ -6,6 +6,7 @@ class ErrorLogDAO {
     constructor () {
     }
 
+    // Create error log
     async create (errorLog) {
         try {
             pool.query(`
@@ -22,6 +23,18 @@ class ErrorLogDAO {
             throw error;
         }
     }
+
+    // Get error log count
+    async getErrorLogCount() {
+        try {
+            const [row] = await pool.query(`SELECT COUNT(*) AS count FROM error_logs`);
+            return row[0].count;
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default ErrorLogDAO;

@@ -48,6 +48,17 @@ class ApiKeyUsageDAO {
             throw error;
         }
     }
+
+    // All api key usage
+    async getAllApiKeyUsage() {
+        try {
+            const [row] = await pool.query(`SELECT SUM(key_usage) AS total_key_usage FROM api_key_usage`);
+            return row[0].total_key_usage;
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default ApiKeyUsageDAO;

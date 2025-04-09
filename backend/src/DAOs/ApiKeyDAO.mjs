@@ -128,6 +128,17 @@ class ApiKeyDAO {
             throw error;
         }
     }
+
+    // All api key count
+    async getAllApiKeyCount() {
+        try {
+            const [row] = await pool.query(`SELECT COUNT(*) AS count FROM api_keys`);
+            return row[0].count;
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default ApiKeyDAO;
