@@ -4,9 +4,9 @@
   "private": true,
   "description": "A modern frontend with dedicated user and admin dashboards that interact with a secure middleware API for exploring and managing detailed country data from RestCountries.com. Includes features like role-based access, dynamic filtering, and real-time data visualization.",
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack -p 4000",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 4000",
     "lint": "next lint"
   },
   "repository": {
