@@ -15,7 +15,7 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
         const dashboard = await dashboardService.getDashboard();
         return res.status(200).send(StandardResponse(
             true,
-            "Admin dashboard details",
+            "Admin dashboard",
             dashboard,
             null
         ));
