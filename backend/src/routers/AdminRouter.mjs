@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import dotenv from 'dotenv';
-import { validationResult, matchedData, checkSchema } from 'express-validator';
 import StandardResponse from '../utils/responses/StandardResponse.mjs';
 import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
 import isAuthenticated from '../middlewares/AdminAuthMiddleware.mjs';
@@ -22,7 +21,7 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
         
     } catch (error) {
         console.log(error);
-        return await ErrorResponse(error, res, '/auth/admin/dashboad');
+        return await ErrorResponse(error, res, '/auth/admin/dashboard');
     }
 });
 
