@@ -1,6 +1,7 @@
 {
-  "name": "6cosc022c.2_cw1",
+  "name": "restcountries_api",
   "version": "1.0.0",
+  "private": true,
   "description": "In this project, I develop a secure API middleware service that interfaces with RestCountries.com, a comprehensive RESTful service providing detailed information about countries worldwide. This application will serve as an intermediary layer, processing and filtering country data while implementing robust security measures.",
   "main": "index.js",
   "scripts": {

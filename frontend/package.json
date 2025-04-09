@@ -1,0 +1,38 @@
+{
+  "name": "restcountries_frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A modern frontend with dedicated user and admin dashboards that interact with a secure middleware API for exploring and managing detailed country data from RestCountries.com. Includes features like role-based access, dynamic filtering, and real-time data visualization.",
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RashmithaDeSilva/6COSC022C.2_CW1.git"
+  },
+  "author": "Lahiru De Silva",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RashmithaDeSilva/6COSC022C.2_CW1/issues"
+  },
+  "homepage": "https://github.com/RashmithaDeSilva/6COSC022C.2_CW1#readme",
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "next": "15.2.5"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@tailwindcss/postcss": "^4",
+    "tailwindcss": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "15.2.5",
+    "@eslint/eslintrc": "^3"
+  }
+}
