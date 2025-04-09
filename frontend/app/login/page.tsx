@@ -1,9 +1,9 @@
-// app/login.tsx
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Link from "next/link";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -56,7 +56,7 @@ export default function Login() {
   };
 
   return (
-    <main className="h-screen flex items-center justify-center bg-gradient-to-br from-green-900 to-black">
+    <main className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-900 to-black">
       <div className="w-full max-w-sm p-8 bg-black/70 rounded-xl shadow-xl">
         <h2 className="text-3xl font-bold text-green-400 text-center mb-6">
           Rest Cuntrys
@@ -114,6 +114,13 @@ export default function Login() {
           </div>
         )}
       </div>
+
+      {/* Back to Home Button */}
+      <Link href="/">
+        <button className="mt-8 bg-blue-500 hover:bg-blue-400 px-4 py-2 rounded-lg font-semibold text-white mb-6">
+          Back to Home
+        </button>
+      </Link>
     </main>
   );
 }
