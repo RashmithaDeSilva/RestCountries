@@ -241,7 +241,7 @@ router.post('/login', [
  *                   example: null
  *                 errors:
  *                   type: object
- *                   example: { "redirect": "/api/v1/auth" }
+ *                   example: { "redirect": "/api/v1/auth/admin/login" }
  *       403:
  *         description: Forbidden - Invalid or missing CSRF token
  *         content:
