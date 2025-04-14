@@ -69,6 +69,17 @@ class SubscriptionTypesDAO {
             throw error;
         }
     }
+    
+    // Get subscription request limit
+    async getSubscriptionRequestLimit(subscriptionId) {
+        try {
+            const [row] = await pool.query(`SELECT api_request_limit FROM subscription_types WHERE id = ?`, [subscriptionId]);
+            return row[0].api_request_limit;
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default SubscriptionTypesDAO;

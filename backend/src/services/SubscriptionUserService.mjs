@@ -9,9 +9,10 @@ class SubscriptionUserService {
     }
 
     // Get user subscription
-    async getUserSubscription(userId) {
+    async getUserSubscriptionDetails(userId) {
         try {
-            return await this.subscriptionUserDAO.getUserSubscription(userId);
+            const subscriptionDetails = await this.subscriptionUserDAO.getUserSubscriptionDetails(userId);
+            return subscriptionDetails;
 
         } catch (error) {
             throw error;

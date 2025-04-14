@@ -131,7 +131,6 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
         ));
         
     } catch (error) {
-        console.log(error);
         return await ErrorResponse(error, res, '/auth/admin/dashboard');
     }
 });

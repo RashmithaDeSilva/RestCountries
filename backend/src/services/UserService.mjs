@@ -116,6 +116,17 @@ class UserService {
             throw error;
         }
     }
+
+    // User api key usage
+    async userApiKeyUsage(userId) {
+        try {
+            const userApiKeyUsage = await this.userDAO.userApiKeyUsage(userId);
+            return userApiKeyUsage;
+            
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default UserService;

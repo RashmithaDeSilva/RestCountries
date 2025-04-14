@@ -6,10 +6,12 @@ import UserValidationSchema from '../utils/validations/UserValidationSchema.mjs'
 import UserService from '../services/UserService.mjs';
 import CommonErrors from '../utils/errors/CommonErrors.mjs';
 import isAuthenticated from '../middlewares/UserAuthMiddleware.mjs';
+import DashboardService from '../services/DashboadService.mjs';
 
 dotenv.config();
 const router = Router();
 const userService = new UserService();
+const dashboardService = new DashboardService();
 
 /**
  * @swagger
@@ -423,11 +425,149 @@ router.patch('/changepassword', isAuthenticated, [
     )) : res.sendStatus(204);
 });
 
+/**
+ * @swagger
+ * /api/v1/auth/user/dashboard:
+ *   get:
+ *     summary: Get user dashboard data
+ *     description: Retrieves dashboard statistics specific to the authenticated user.
+ *     tags:
+ *       - User
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: User dashboard data retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: User dashboard
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     subscriptionPlan:
+ *                       type: string
+ *                       example: Free
+ *                     incluge:
+ *                       type: integer
+ *                       example: 1000
+ *                     apiKyeUsage:
+ *                       type: integer
+ *                       example: 0
+ *                 errors:
+ *                   type: string
+ *                   nullable: true
+ *                   example: null
+ *       401:
+ *         description: Unauthorized - User not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Authentication failed
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: object
+ *                   example: { "redirect": "/api/v1/auth" }
+ *       400:
+ *         description: Validation error (e.g., incorrect old password, mismatched new passwords, or hash verification failure)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Validation error.
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       msg:
+ *                         type: string
+ *                       param:
+ *                         type: string
+ *                       location:
+ *                         type: string
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: User not found.
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error.
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ * components:
+ *   securitySchemes:
+ *     cookieAuth:
+ *       type: apiKey
+ *       in: cookie
+ *       name: connect.sid
+ */
 router.get('/dashboard', isAuthenticated, async (req, res) => {
     try {
-        
+        const dashboard = await dashboardService.getUserDashboard(req.user.id);
+        return res.status(200).send(StandardResponse(
+            true,
+            "User dashboard",
+            dashboard,
+            null
+        ));
+
     } catch (error) {
-        return await ErrorResponse(error, res, '/user/changepassword', data);
+        return await ErrorResponse(error, res, '/user/dashboard', data);
     }
 })
 

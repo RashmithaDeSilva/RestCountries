@@ -41,13 +41,11 @@ class DashboardService {
 
     // User dashboard
     async getUserDashboard(usersId) {
-        // subscription lan
-        // api key usage
-        // include
+        const userSubscriptionDetails = await this.subscriptionUserService.getUserSubscriptionDetails(usersId);
         return {
-            subscriptionPlan: await this.subscriptionUserDAO.getUserSubscription(usersId),
-            apiKyeUsage: "",
-            incluge: ""
+            subscriptionPlan: userSubscriptionDetails.subscription_name,
+            incluge: await this.subscriptionTypeService.getSubscriptionRequestLimit(userSubscriptionDetails.subscription_id),
+            apiKyeUsage: await this.userService.userApiKeyUsage(usersId),
         };
     }
 }

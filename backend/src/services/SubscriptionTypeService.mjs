@@ -38,6 +38,17 @@ class SubscriptionTypeService {
             throw error;
         }
     }
+
+    // Get subscription request limit
+    async getSubscriptionRequestLimit(subscriptionId) {
+        try {
+            const getSubscriptionRequestLimit = await this.subscriptionTypesDAO.getSubscriptionRequestLimit(subscriptionId);
+            return getSubscriptionRequestLimit;
+            
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default SubscriptionTypeService;

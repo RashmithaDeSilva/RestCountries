@@ -1,0 +1,1 @@
+ok next page is user page so its strakcher is its nav bar left side coner shows website name and right side coner shows option user icon and if user clik that itwill redirect to users detals page nad in the body have two sides left side show his usage in sercle that increes with users usage and middel of 
