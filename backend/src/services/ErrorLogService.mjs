@@ -19,6 +19,17 @@ class ErrorLogService {
             log(LogTypes.ERROR, `Failed to log error: ${ error }`);
         }
     }
+
+    // Get error log count
+    async getErrorLogCount() {
+        try {
+            const errorLogCount = await this.errorLogDAO.getErrorLogCount();
+            return errorLogCount;
+            
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default ErrorLogService;

@@ -28,6 +28,16 @@ class SubscriptionTypeService {
         }
     }
 
+    // Get subscription types count
+    async getSubscriptionTypesCount() {
+        try {
+            const subscriptionTypesCount = await this.subscriptionTypesDAO.getSubscriptionTypesCount();
+            return subscriptionTypesCount;
+            
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default SubscriptionTypeService;

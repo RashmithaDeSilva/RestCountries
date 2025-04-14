@@ -157,6 +157,17 @@ class ApiKeyService {
             throw error;
         }
     }
+
+    // Get all api key count
+    async getAllApiKeyCount() {
+        try {
+            const apiKeyCount = await this.apiKeyDAO.getAllApiKeyCount();
+            return apiKeyCount;
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default ApiKeyService;

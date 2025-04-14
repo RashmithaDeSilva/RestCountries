@@ -1,11 +1,11 @@
 import AdminService from '../services/AdminService.mjs';
-import UserDAO from '../DAOs/UserDAO.mjs';
-import ApiKeyUsageDAO from '../DAOs/ApiKeyUsageDAO.mjs';
+import UserService from './UserService.mjs';
+import ApiKeyUsageService from './ApiKeyUsageService.mjs';
 import CacheStoreService from './CacheStoreService.mjs';
-import SubscriptionUserDAO from '../DAOs/SubscriptionUserDAO.mjs';
-import ErrorLogDAO from '../DAOs/ErrorLogDAO.mjs';
-import SubscriptionTypeDAO from '../DAOs/SubscriptionTypesDAO.mjs';
-import ApiKeyDAO from '../DAOs/ApiKeyDAO.mjs';
+import SubscriptionUserService from './SubscriptionUserService.mjs';
+import ErrorLogService from './ErrorLogService.mjs';
+import SubscriptionTypeService from './SubscriptionTypeService.mjs';
+import ApiKeyService from './ApiKeyService.mjs';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -13,13 +13,13 @@ dotenv.config();
 class DashboardService {
     constructor() {
         this.adminService = new AdminService();
-        this.userDAO = new UserDAO();
-        this.apiKeyUsageDAO = new ApiKeyUsageDAO();
+        this.userService = new UserService();
+        this.apiKeyUsageService = new ApiKeyUsageService();
         this.cacheStoreService = new CacheStoreService();
-        this.subscriptionUserDAO = new SubscriptionUserDAO();
-        this.errorLogDAO = new ErrorLogDAO();
-        this.subscriptionTypeDAO = new SubscriptionTypeDAO();
-        this.apiKeyDAO = new ApiKeyDAO();
+        this.subscriptionUserService = new SubscriptionUserService();
+        this.errorLogService = new ErrorLogService();
+        this.subscriptionTypeService = new SubscriptionTypeService();
+        this.apiKeyService = new ApiKeyService();
     }
 
     // Admin dashboard
@@ -27,15 +27,15 @@ class DashboardService {
         const onlineUsers = await this.cacheStoreService.getOnlineAdminsAndUsersBySesions();
         return {
             adminCount: await this.adminService.getAdminCount(),
-            userCount: await this.userDAO.getUsersCount(),
-            subscriptionTypesCount: await this.subscriptionTypeDAO.getSubscriptionTypesCount(),
-            apiKeyCount: await this.apiKeyDAO.getAllApiKeyCount(),
-            errorCount: await this.errorLogDAO.getErrorLogCount(),
-            subscriptionUserCount: await this.subscriptionUserDAO.getSubscribeUsersCount(),
-            apiKeyUsage: await this.apiKeyUsageDAO.getAllApiKeyUsage(),
+            userCount: await this.userService.getUsersCount(),
+            subscriptionTypesCount: await this.subscriptionTypeService.getSubscriptionTypesCount(),
+            apiKeyCount: await this.apiKeyService.getAllApiKeyCount(),
+            errorCount: await this.errorLogService.getErrorLogCount(),
+            subscriptionUserCount: await this.subscriptionUserService.getSubscribeUsersCount(),
+            apiKeyUsage: await this.apiKeyUsageService.getAllApiKeyUsage(),
             onlineAdminsCount: onlineUsers.adminsCount,
             onlineUsersCount: onlineUsers.usersCount,
-            income: await this.subscriptionUserDAO.getIncome(),
+            income: await this.subscriptionUserService.getIncome(),
         };
     }
 

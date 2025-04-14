@@ -105,6 +105,17 @@ class UserService {
             throw error;
         }
     }
+
+    // Get users count 
+    async getUsersCount() {
+        try {
+            const usersCount = await this.userDAO.getUsersCount();
+            return usersCount;
+            
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default UserService;

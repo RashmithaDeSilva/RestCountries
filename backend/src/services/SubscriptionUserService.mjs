@@ -18,6 +18,28 @@ class SubscriptionUserService {
         }
     }
 
+    // Get subscrib users count 
+    async getSubscribeUsersCount() {
+        try {
+            const subscribeUsers = await this.subscriptionUserDAO.getSubscribeUsersCount();
+            return subscribeUsers;
+            
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get income
+    async getIncome() {
+        try {
+            const income = await this.subscriptionUserDAO.getIncome();
+            return income;
+            
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default SubscriptionUserService;
