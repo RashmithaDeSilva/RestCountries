@@ -110,6 +110,17 @@ class CacheStoreService {
             throw error;
         }
     }
+
+    // Get online users and admins based on unique sessions
+    async getOnlineAdminsAndUsersBySesions() {
+        try {
+            const dashboardDetals = await this.cacheStoreDAO.getOnlineAdminsAndUsersBySesions();
+            return dashboardDetals;
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default CacheStoreService;

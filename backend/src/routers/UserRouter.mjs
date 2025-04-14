@@ -423,4 +423,12 @@ router.patch('/changepassword', isAuthenticated, [
     )) : res.sendStatus(204);
 });
 
+router.get('/dashboard', isAuthenticated, async (req, res) => {
+    try {
+        
+    } catch (error) {
+        return await ErrorResponse(error, res, '/user/changepassword', data);
+    }
+})
+
 export default router;

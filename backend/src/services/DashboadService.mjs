@@ -1,7 +1,7 @@
-import AdminDAO from '../DAOs/AdminDAO.mjs';
+import AdminService from '../services/AdminService.mjs';
 import UserDAO from '../DAOs/UserDAO.mjs';
 import ApiKeyUsageDAO from '../DAOs/ApiKeyUsageDAO.mjs';
-import CacheStoreDAO from '../DAOs/CacheStoreDAO.mjs';
+import CacheStoreService from './CacheStoreService.mjs';
 import SubscriptionUserDAO from '../DAOs/SubscriptionUserDAO.mjs';
 import ErrorLogDAO from '../DAOs/ErrorLogDAO.mjs';
 import SubscriptionTypeDAO from '../DAOs/SubscriptionTypesDAO.mjs';
@@ -12,10 +12,10 @@ dotenv.config();
 
 class DashboardService {
     constructor() {
-        this.adminDAO = new AdminDAO();
+        this.adminService = new AdminService();
         this.userDAO = new UserDAO();
         this.apiKeyUsageDAO = new ApiKeyUsageDAO();
-        this.cacheStoreDAO = new CacheStoreDAO();
+        this.cacheStoreService = new CacheStoreService();
         this.subscriptionUserDAO = new SubscriptionUserDAO();
         this.errorLogDAO = new ErrorLogDAO();
         this.subscriptionTypeDAO = new SubscriptionTypeDAO();
@@ -23,10 +23,10 @@ class DashboardService {
     }
 
     // Admin dashboard
-    async getDashboard() {
-        const onlineUsers = await this.cacheStoreDAO.getOnlineAdminsAndUsersBySesions();
+    async getAdminDashboard() {
+        const onlineUsers = await this.cacheStoreService.getOnlineAdminsAndUsersBySesions();
         return {
-            adminCount: await this.adminDAO.getAdminCount(),
+            adminCount: await this.adminService.getAdminCount(),
             userCount: await this.userDAO.getUsersCount(),
             subscriptionTypesCount: await this.subscriptionTypeDAO.getSubscriptionTypesCount(),
             apiKeyCount: await this.apiKeyDAO.getAllApiKeyCount(),
@@ -38,7 +38,18 @@ class DashboardService {
             income: await this.subscriptionUserDAO.getIncome(),
         };
     }
-    
+
+    // User dashboard
+    async getUserDashboard(usersId) {
+        // subscription lan
+        // api key usage
+        // include
+        return {
+            subscriptionPlan: await this.subscriptionUserDAO.getUserSubscription(usersId),
+            apiKyeUsage: "",
+            incluge: ""
+        };
+    }
 }
 
 export default DashboardService;

@@ -62,7 +62,7 @@ export default function SignUp() {
     <main className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-900 to-black">
       <div className="w-full max-w-sm p-8 bg-black/70 rounded-xl shadow-xl">
         <h2 className="text-3xl font-bold text-green-400 text-center mb-6">
-          Sign Up
+          Rest Countries
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">

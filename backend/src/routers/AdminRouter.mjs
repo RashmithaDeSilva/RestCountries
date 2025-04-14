@@ -122,7 +122,7 @@ const dashboardService = new DashboardService();
  */
 router.get('/dashboard', isAuthenticated, async (req, res) => {
     try {
-        const dashboard = await dashboardService.getDashboard();
+        const dashboard = await dashboardService.getAdminDashboard();
         return res.status(200).send(StandardResponse(
             true,
             "Admin dashboard",
