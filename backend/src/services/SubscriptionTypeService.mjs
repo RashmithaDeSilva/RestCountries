@@ -18,16 +18,37 @@ class SubscriptionTypeService {
         }
     }
 
-    // Get subscription type
-    async getSubscriptionType(subId) {
+    // // Get subscription type
+    // async getSubscriptionType(subId) {
+    //     try {
+    //         return await this.subscriptionTypesDAO.getSubscriptionType(subId);
+            
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
+
+    // Get subscription types count
+    async getSubscriptionTypesCount() {
         try {
-            return await this.subscriptionTypesDAO.getSubscriptionType(subId);
+            const subscriptionTypesCount = await this.subscriptionTypesDAO.getSubscriptionTypesCount();
+            return subscriptionTypesCount;
             
         } catch (error) {
             throw error;
         }
     }
 
+    // Get subscription request limit
+    async getSubscriptionRequestLimit(subscriptionId) {
+        try {
+            const getSubscriptionRequestLimit = await this.subscriptionTypesDAO.getSubscriptionRequestLimit(subscriptionId);
+            return getSubscriptionRequestLimit;
+            
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default SubscriptionTypeService;

@@ -23,16 +23,21 @@ class SubscriptionUserDAO {
         }
     }
 
-    // Get user subscription
-    async getUserSubscription(userId) {
+    // Get user subscription details
+    async getUserSubscriptionDetails(userId) {
         try {
-            const [row] = await pool.query("SELECT subscription_id FROM subscription_users WHERE user_id = ?", [userId]);
-            if (row.length > 0) {
-                return row[0].subscription_id;
-            }
-
-            // Defaul free sub id
-            return 1;
+            const [row] = await pool.query(`
+                SELECT 
+                    st.id AS subscription_id,
+                    st.subscription_name
+                FROM 
+                    subscription_users su
+                JOIN 
+                    subscription_types st ON su.subscription_id = st.id
+                WHERE 
+                    su.user_id = ?;
+                `, [userId]);
+            return row[0];
             
         } catch (error) {
             throw error;

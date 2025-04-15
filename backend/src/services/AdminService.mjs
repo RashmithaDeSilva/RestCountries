@@ -116,6 +116,17 @@ class AdminService {
         }
     }
 
+    // Admin count
+    async getAdminCount() {
+        try {
+            const adminCount = await this.adminDAO.getAdminCount();
+            return adminCount;
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default AdminService;

@@ -181,6 +181,17 @@ class UserDAO {
             throw error;
         }
     }
+
+    // User api key usage
+    async userApiKeyUsage(userId) {
+        try {
+            const [row] = await pool.query(`SELECT key_usage FROM api_key_usage WHERE user_id = ?`, [userId]);
+            return row[0].key_usage;
+            
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default UserDAO;

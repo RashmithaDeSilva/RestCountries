@@ -26,6 +26,17 @@ class ApiKeyUsageService {
             throw error;
         }
     }
+
+    // Get all api key usage
+    async getAllApiKeyUsage() {
+        try {
+            const allApiKeyUsage = await this.apiKeyUsageDAO.getAllApiKeyUsage();
+            return allApiKeyUsage;
+            
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default ApiKeyUsageService;

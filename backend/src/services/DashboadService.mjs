@@ -1,44 +1,53 @@
-import AdminDAO from '../DAOs/AdminDAO.mjs';
-import UserDAO from '../DAOs/UserDAO.mjs';
-import ApiKeyUsageDAO from '../DAOs/ApiKeyUsageDAO.mjs';
-import CacheStoreDAO from '../DAOs/CacheStoreDAO.mjs';
-import SubscriptionUserDAO from '../DAOs/SubscriptionUserDAO.mjs';
-import ErrorLogDAO from '../DAOs/ErrorLogDAO.mjs';
-import SubscriptionTypeDAO from '../DAOs/SubscriptionTypesDAO.mjs';
-import ApiKeyDAO from '../DAOs/ApiKeyDAO.mjs';
+import AdminService from '../services/AdminService.mjs';
+import UserService from './UserService.mjs';
+import ApiKeyUsageService from './ApiKeyUsageService.mjs';
+import CacheStoreService from './CacheStoreService.mjs';
+import SubscriptionUserService from './SubscriptionUserService.mjs';
+import ErrorLogService from './ErrorLogService.mjs';
+import SubscriptionTypeService from './SubscriptionTypeService.mjs';
+import ApiKeyService from './ApiKeyService.mjs';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 class DashboardService {
     constructor() {
-        this.adminDAO = new AdminDAO();
-        this.userDAO = new UserDAO();
-        this.apiKeyUsageDAO = new ApiKeyUsageDAO();
-        this.cacheStoreDAO = new CacheStoreDAO();
-        this.subscriptionUserDAO = new SubscriptionUserDAO();
-        this.errorLogDAO = new ErrorLogDAO();
-        this.subscriptionTypeDAO = new SubscriptionTypeDAO();
-        this.apiKeyDAO = new ApiKeyDAO();
+        this.adminService = new AdminService();
+        this.userService = new UserService();
+        this.apiKeyUsageService = new ApiKeyUsageService();
+        this.cacheStoreService = new CacheStoreService();
+        this.subscriptionUserService = new SubscriptionUserService();
+        this.errorLogService = new ErrorLogService();
+        this.subscriptionTypeService = new SubscriptionTypeService();
+        this.apiKeyService = new ApiKeyService();
     }
 
     // Admin dashboard
-    async getDashboard() {
-        const onlineUsers = await this.cacheStoreDAO.getOnlineAdminsAndUsersBySesions();
+    async getAdminDashboard() {
+        const onlineUsers = await this.cacheStoreService.getOnlineAdminsAndUsersBySesions();
         return {
-            adminCount: await this.adminDAO.getAdminCount(),
-            userCount: await this.userDAO.getUsersCount(),
-            subscriptionTypesCount: await this.subscriptionTypeDAO.getSubscriptionTypesCount(),
-            apiKeyCount: await this.apiKeyDAO.getAllApiKeyCount(),
-            errorCount: await this.errorLogDAO.getErrorLogCount(),
-            subscriptionUserCount: await this.subscriptionUserDAO.getSubscribeUsersCount(),
-            apiKeyUsage: await this.apiKeyUsageDAO.getAllApiKeyUsage(),
+            adminCount: await this.adminService.getAdminCount(),
+            userCount: await this.userService.getUsersCount(),
+            subscriptionTypesCount: await this.subscriptionTypeService.getSubscriptionTypesCount(),
+            apiKeyCount: await this.apiKeyService.getAllApiKeyCount(),
+            errorCount: await this.errorLogService.getErrorLogCount(),
+            subscriptionUserCount: await this.subscriptionUserService.getSubscribeUsersCount(),
+            apiKeyUsage: await this.apiKeyUsageService.getAllApiKeyUsage(),
             onlineAdminsCount: onlineUsers.adminsCount,
             onlineUsersCount: onlineUsers.usersCount,
-            income: await this.subscriptionUserDAO.getIncome(),
+            income: await this.subscriptionUserService.getIncome(),
         };
     }
-    
+
+    // User dashboard
+    async getUserDashboard(usersId) {
+        const userSubscriptionDetails = await this.subscriptionUserService.getUserSubscriptionDetails(usersId);
+        return {
+            subscriptionPlan: userSubscriptionDetails.subscription_name,
+            incluge: await this.subscriptionTypeService.getSubscriptionRequestLimit(userSubscriptionDetails.subscription_id),
+            apiKyeUsage: await this.userService.userApiKeyUsage(usersId),
+        };
+    }
 }
 
 export default DashboardService;

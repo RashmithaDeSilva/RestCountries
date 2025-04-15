@@ -315,6 +315,17 @@ router.post('/register', [
  *       - User Authentication
  *     security:
  *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               _csrf:
+ *                 type: string
+ *                 example: 5c325207-aa6f-42d9-80f7-284df562bcca
+ *                 description: New csrf token
  *     responses:
  *       200:
  *         description: "Successfully logged out."
@@ -382,7 +393,6 @@ router.post('/register', [
  */
 router.post('/logout', isAuthenticated, async (req, res) => {
     const logOutAsync = promisify(req.logOut).bind(req);
-
     try {
         await logOutAsync();
         return res.status(200).send(StandardResponse(

@@ -1,8 +1,8 @@
 -- Create database
-CREATE DATABASE IF NOT EXISTS cw1;
+CREATE DATABASE IF NOT EXISTS restcountries;
 
 -- Use database that create
-USE cw1;
+USE restcountries;
 
 -- Admin table
 CREATE TABLE IF NOT EXISTS admins (
@@ -136,17 +136,11 @@ BEGIN
 END;
 
 -- Insert super admin
--- INSERT INTO admins (id, first_name, surname, email, contact_number, roll, password_hash)
--- VALUES 
---     (1, 'Super', 'Admin', 'admin@example.com', '+94761234567', 'SUPER_ADMIN', 
---     '$argon2id$v=19$m=65536,t=3,p=1$4Z0ePixF6hbnfppLSoqlYw$5iLt1QIXlARhJc2mSwXB5yETHH+ZsKslfB03XJpntCg') -- password12345
--- ON DUPLICATE KEY UPDATE
---     first_name = VALUES(first_name),
---     surname = VALUES(surname),
---     email = VALUES(email),
---     contact_number = VALUES(contact_number),
---     roll = VALUES(roll),
---     password_hash = VALUES(password_hash);
+INSERT INTO admins (id, first_name, surname, email, contact_number, roll, password_hash)
+SELECT 
+    1, 'Super', 'Admin', 'admin@example.com', '+94761234567', 'SUPER_ADMIN', 
+    '$argon2id$v=19$m=65536,t=3,p=1$4Z0ePixF6hbnfppLSoqlYw$5iLt1QIXlARhJc2mSwXB5yETHH+ZsKslfB03XJpntCg' -- password12345
+WHERE NOT EXISTS (SELECT 1 FROM admins LIMIT 1);
 
 -- Insert initial subscription types
 INSERT INTO subscription_types (id, subscription_name, subscription_price, subscription_price_currency, api_request_limit, api_key_limit, description, function_description)

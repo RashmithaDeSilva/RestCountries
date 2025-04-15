@@ -1,0 +1,6 @@
+node_modules
+Dockerfile
+.dockerignore
+cw1.db
+restcountries.db
+.env

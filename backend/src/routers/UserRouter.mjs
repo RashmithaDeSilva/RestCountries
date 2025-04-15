@@ -6,14 +6,18 @@ import UserValidationSchema from '../utils/validations/UserValidationSchema.mjs'
 import UserService from '../services/UserService.mjs';
 import CommonErrors from '../utils/errors/CommonErrors.mjs';
 import isAuthenticated from '../middlewares/UserAuthMiddleware.mjs';
+import DashboardService from '../services/DashboadService.mjs';
+import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
 
 dotenv.config();
+const ENV = process.env.ENV;
 const router = Router();
 const userService = new UserService();
+const dashboardService = new DashboardService();
 
 /**
  * @swagger
- * /api/v1/auth/user:
+ * /api/v1/auth/user/info:
  *   get:
  *     summary: "Get user status"
  *     description: "This endpoint retrieves the status of the currently authenticated user."
@@ -88,10 +92,10 @@ const userService = new UserService();
  *       in: cookie
  *       name: connect.sid
  */
-router.get('/', isAuthenticated, (req, res) => {
+router.get('/info', isAuthenticated, (req, res) => {
     return res.status(200).send(StandardResponse(
         true,
-        "User status.",
+        "User info.",
         req.user,
         null
     ));
@@ -115,7 +119,7 @@ router.get('/', isAuthenticated, (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               firstName:
+ *               first_name:
  *                 type: string
  *                 example: "John"
  *               surname:
@@ -124,9 +128,13 @@ router.get('/', isAuthenticated, (req, res) => {
  *               email:
  *                 type: string
  *                 example: "john.doe@example.com"
- *               contactNumber:
+ *               contact_number:
  *                 type: string
  *                 example: "+94761234567"
+ *               _csrf:
+ *                 type: string
+ *                 example: 5c325207-aa6f-42d9-80f7-284df562bcca
+ *                 description: New csrf token
  *     responses:
  *       200:
  *         description: "Successfully updated user information"
@@ -229,7 +237,7 @@ router.put('/update', isAuthenticated, [
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, null, errors);
+        return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, '/user/update/', errors);
     }
 
     const data = matchedData(req);
@@ -268,18 +276,22 @@ router.put('/update', isAuthenticated, [
  *           schema:
  *             type: object
  *             properties:
- *               oldPassword:
+ *               old_password:
  *                 type: string
  *                 format: password
  *                 example: "oldPassword123"
- *               newPassword:
+ *               password:
  *                 type: string
  *                 format: password
  *                 example: "NewStrongPassword123!"
- *               confirmPassword:
+ *               confirm_password:
  *                 type: string
  *                 format: password
  *                 example: "NewStrongPassword123!"
+ *               _csrf:
+ *                 type: string
+ *                 example: 5c325207-aa6f-42d9-80f7-284df562bcca
+ *                 description: New csrf token
  *     responses:
  *       200:
  *         description: "Password changed successfully."
@@ -402,7 +414,7 @@ router.patch('/changepassword', isAuthenticated, [
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, null, errors);
+        return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, '/user/changepassword', errors);
     }
 
     const data = matchedData(req);
@@ -421,6 +433,236 @@ router.patch('/changepassword', isAuthenticated, [
         null,
         null
     )) : res.sendStatus(204);
+});
+
+/**
+ * @swagger
+ * /api/v1/auth/user/dashboard:
+ *   get:
+ *     summary: Get user dashboard data
+ *     description: Retrieves dashboard statistics specific to the authenticated user.
+ *     tags:
+ *       - User
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: User dashboard data retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: User dashboard
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     subscriptionPlan:
+ *                       type: string
+ *                       example: Free
+ *                     incluge:
+ *                       type: integer
+ *                       example: 1000
+ *                     apiKyeUsage:
+ *                       type: integer
+ *                       example: 0
+ *                 errors:
+ *                   type: string
+ *                   nullable: true
+ *                   example: null
+ *       401:
+ *         description: Unauthorized - User not authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Authentication failed
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: object
+ *                   example: { "redirect": "/api/v1/auth" }
+ *       400:
+ *         description: Validation error (e.g., incorrect old password, mismatched new passwords, or hash verification failure)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Validation error.
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       msg:
+ *                         type: string
+ *                       param:
+ *                         type: string
+ *                       location:
+ *                         type: string
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: User not found.
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error.
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ * components:
+ *   securitySchemes:
+ *     cookieAuth:
+ *       type: apiKey
+ *       in: cookie
+ *       name: connect.sid
+ */
+router.get('/dashboard', isAuthenticated, async (req, res) => {
+    try {
+        const dashboard = await dashboardService.getUserDashboard(req.user.id);
+        return res.status(200).send(StandardResponse(
+            true,
+            "User dashboard",
+            dashboard,
+            null
+        ));
+
+    } catch (error) {
+        return await ErrorResponse(error, res, '/user/dashboard', data);
+    }
+})
+
+/**
+ * @swagger
+ * /api/v1/auth/user/status:
+ *   get:
+ *     summary: Get user authentication status
+ *     description: Checks if the user is authenticated and returns a confirmation status.
+ *     tags:
+ *       - User
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: User is authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: User status.
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: "null"
+ *                   example: null
+ *       401:
+ *         description: Unauthorized - User is not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Authentication failed
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: object
+ *                   example: { "redirect": "/api/v1/auth" }
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error.
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ * components:
+ *   securitySchemes:
+ *     cookieAuth:
+ *       type: apiKey
+ *       in: cookie
+ *       name: connect.sid
+ */
+router.get('/status', isAuthenticated, async (req, res) => {
+    return res.status(200).send(StandardResponse(
+        true,
+        "User status.",
+        null,
+        null
+    ));
 });
 
 export default router;
