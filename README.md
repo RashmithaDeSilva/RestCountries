@@ -69,8 +69,8 @@ It supports user registration, login, and API key management, with secure data s
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/RashmithaDeSilva/6COSC022C.2_CW1.git
-cd 6COSC022C.2_CW1
+git clone https://github.com/RashmithaDeSilva/RestCountries.git
+cd RestCountries
 ```
 
 ### 2. Run the Application
