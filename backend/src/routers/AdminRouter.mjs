@@ -135,4 +135,88 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/v1/auth/admin/status:
+ *   get:
+ *     summary: Get admin authentication status
+ *     description: Checks if the admin is authenticated and returns a confirmation status.
+ *     tags:
+ *       - Admin Authentication
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Admin is authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Admin status.
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: "null"
+ *                   example: null
+ *       401:
+ *         description: Unauthorized - Admin is not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Authentication failed
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: object
+ *                   example: { "redirect": "/api/v1/auth" }
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error.
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ * components:
+ *   securitySchemes:
+ *     cookieAuth:
+ *       type: apiKey
+ *       in: cookie
+ *       name: connect.sid
+ */
+router.get('/status', isAuthenticated, async (req, res) => {
+    return res.status(200).send(StandardResponse(
+        true,
+        "Admin status.",
+        null,
+        null
+    ));
+});
+
 export default router;

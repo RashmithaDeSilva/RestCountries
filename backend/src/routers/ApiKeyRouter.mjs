@@ -127,6 +127,10 @@ router.get('/', isAuthenticated, async (req, res) => {
  *               new_api_key_name:
  *                 type: string
  *                 example: "newApiKeyName"
+ *               _csrf:
+ *                 type: string
+ *                 example: 5c325207-aa6f-42d9-80f7-284df562bcca
+ *                 description: New csrf token
  *     responses:
  *       200:
  *         description: "API key name changed successfully (Works on only dev env othervice return with 204)"
@@ -308,6 +312,10 @@ router.patch('/changename', isAuthenticated, [
  *               api_key_name:
  *                 type: string
  *                 example: "newApiKey"
+ *               _csrf:
+ *                 type: string
+ *                 example: 5c325207-aa6f-42d9-80f7-284df562bcca
+ *                 description: New csrf token
  *     responses:
  *       200:
  *         description: "API key generated successfully."
@@ -479,6 +487,10 @@ router.patch('/generatenewkey', isAuthenticated, [
  *               api_key_name:
  *                 type: string
  *                 example: "myNewApiKey"
+ *               _csrf:
+ *                 type: string
+ *                 example: 5c325207-aa6f-42d9-80f7-284df562bcca
+ *                 description: New csrf token
  *     responses:
  *       200:
  *         description: "API key created successfully."
@@ -650,6 +662,10 @@ router.post('/createnewkey', isAuthenticated, [
  *               api_key_name:
  *                 type: string
  *                 example: "myOldApiKey"
+ *               _csrf:
+ *                 type: string
+ *                 example: 5c325207-aa6f-42d9-80f7-284df562bcca
+ *                 description: New csrf token
  *     responses:
  *       200:
  *         description: "API key deleted successfully."

@@ -131,6 +131,10 @@ router.get('/info', isAuthenticated, (req, res) => {
  *               contact_number:
  *                 type: string
  *                 example: "+94761234567"
+ *               _csrf:
+ *                 type: string
+ *                 example: 5c325207-aa6f-42d9-80f7-284df562bcca
+ *                 description: New csrf token
  *     responses:
  *       200:
  *         description: "Successfully updated user information"
@@ -284,6 +288,10 @@ router.put('/update', isAuthenticated, [
  *                 type: string
  *                 format: password
  *                 example: "NewStrongPassword123!"
+ *               _csrf:
+ *                 type: string
+ *                 example: 5c325207-aa6f-42d9-80f7-284df562bcca
+ *                 description: New csrf token
  *     responses:
  *       200:
  *         description: "Password changed successfully."

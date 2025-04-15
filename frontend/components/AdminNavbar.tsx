@@ -22,14 +22,14 @@ export default function Navbar() {
 
   const forceLogout = () => {
     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-    router.push("/login");
+    router.push("/admin");
   };
 
   // Check user status every 5 seconds
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const res = await axios.get("/api/auth/user/status");
+        const res = await axios.get("/api/auth/admin/status");
         if (!res?.data?.status) {
           showNotification("error", "Unauthorized. Redirecting...");
           forceLogout();
@@ -71,7 +71,7 @@ export default function Navbar() {
       const csrfRes = await axios.get("/api/auth/csrf-token");
       const freshCsrf = csrfRes.data.data.CSRF_Token;
   
-      const res = await axios.post("/api/auth/logout", { _csrf: freshCsrf });
+      const res = await axios.post("/api/auth/admin/logout", { _csrf: freshCsrf });
       if (res.status === 200 && res.data.status) {
         forceLogout();
       } else {
@@ -97,13 +97,13 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-8">
-          <button
+          {/* <button
             onClick={() => router.push("/user/info")}
             className="hover:text-green-400 transition duration-200"
             title="User Details"
           >
             <User className="w-7 h-7" />
-          </button>
+          </button> */}
 
           <button
             onClick={handleLogout}
