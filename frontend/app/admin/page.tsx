@@ -20,7 +20,7 @@ export default function Login() {
     setErrorMessage("");
 
     try {
-      const response = await axios.post("/api/auth/login", {
+      const response = await axios.post("/api/auth/admin/login", {
         email,
         password,
       });
@@ -30,7 +30,7 @@ export default function Login() {
         document.cookie = `token=${response.data.data}; path=/;`;
 
         // Redirect to the user page
-        router.push("/user");
+        router.push("/admin/dashboard");
       } else {
         setErrorMessage("Something went wrong, please try again.");
       }
@@ -62,7 +62,7 @@ export default function Login() {
           Rest Countries
         </h2>
         <h4 className="text-3lg font-bold text-green-400 text-center mb-6">
-          User Login
+          Admin Login
         </h4>
 
         <form onSubmit={handleSubmit} className="space-y-4">
