@@ -1,4 +1,4 @@
-# 6COSC022C.2 CW 1 Secure API Middleware Service with Frontend
+# RestCountries Secure API Middleware Service with Frontend
 
 ![alt text](readme-imgs/home.png)
 
