@@ -1,7 +1,7 @@
 version: '3.9'
 
 networks:
-  cw1_network:
+  restcountries_network:
     driver: bridge
     ipam:
       config:
@@ -14,11 +14,11 @@ services:
     restart: unles-stop
     environment:
       MYSQL_ROOT_PASSWORD: 12345
-      MYSQL_DATABASE: cw1
+      MYSQL_DATABASE: restcountries.db
     ports:
       - "3306:3306"
     networks:
-      - cw1_network
+      - restcountries_network
 
   redis:
     image: redis:7.4-alpine3.21
@@ -27,7 +27,7 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - cw1_network
+      - restcountries_network
 
   node_app:
     build:
@@ -39,6 +39,6 @@ services:
     ports:
       - "3001:3001"
     networks:
-      - cw1_network
+      - restcountries_network
     depends_on:
       - mysql

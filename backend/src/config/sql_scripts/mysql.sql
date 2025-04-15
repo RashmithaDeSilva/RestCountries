@@ -1,8 +1,8 @@
 -- Create database
-CREATE DATABASE IF NOT EXISTS cw1;
+CREATE DATABASE IF NOT EXISTS restcountries;
 
 -- Use database that create
-USE cw1;
+USE restcountries;
 
 -- Admin table
 CREATE TABLE IF NOT EXISTS admins (

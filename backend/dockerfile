@@ -10,8 +10,7 @@ COPY package*.json ./
 RUN npm install
 
 # Copy the rest of the application
-COPY index.mjs .
-COPY src ./src
+COPY . .
 
 # Expose port 3001
 EXPOSE 3001

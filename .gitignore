@@ -3,6 +3,7 @@
 /backend/.env
 note.txt
 /backend/cw1.db
+/backend/restcountries.db
 
 
 # Frontend --------------------------------------------------------------

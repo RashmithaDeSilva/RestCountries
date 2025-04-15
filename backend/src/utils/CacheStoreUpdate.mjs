@@ -23,7 +23,7 @@ async function allCountries() {
         // log(LogTypes.INFO, "All countries data fetched successfully");
 
         // Load data from file
-        const fileData = readFileSync(process.env.DATA_RETRIEVE_FILE || '../restcountries.com_v3.1_all.json', 'utf-8')
+        const fileData = readFileSync(process.env.DATA_RETRIEVE_FILE || './restcountries.com_v3.1_all.json', 'utf-8')
         const data = JSON.parse(fileData);
         
         await cacheStoreService.saveCache(new CacheStoreModel("cache:countries", data));
