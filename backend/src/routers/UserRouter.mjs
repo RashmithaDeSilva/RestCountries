@@ -15,7 +15,7 @@ const dashboardService = new DashboardService();
 
 /**
  * @swagger
- * /api/v1/auth/user:
+ * /api/v1/auth/user/info:
  *   get:
  *     summary: "Get user status"
  *     description: "This endpoint retrieves the status of the currently authenticated user."
@@ -90,10 +90,10 @@ const dashboardService = new DashboardService();
  *       in: cookie
  *       name: connect.sid
  */
-router.get('/', isAuthenticated, (req, res) => {
+router.get('/info', isAuthenticated, (req, res) => {
     return res.status(200).send(StandardResponse(
         true,
-        "User status.",
+        "User info.",
         req.user,
         null
     ));
@@ -570,5 +570,89 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
         return await ErrorResponse(error, res, '/user/dashboard', data);
     }
 })
+
+/**
+ * @swagger
+ * /api/v1/auth/user/status:
+ *   get:
+ *     summary: Get user authentication status
+ *     description: Checks if the user is authenticated and returns a confirmation status.
+ *     tags:
+ *       - User
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: User is authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: User status.
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: "null"
+ *                   example: null
+ *       401:
+ *         description: Unauthorized - User is not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Authentication failed
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: object
+ *                   example: { "redirect": "/api/v1/auth" }
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error.
+ *                 data:
+ *                   type: "null"
+ *                   example: null
+ *                 errors:
+ *                   type: string
+ *                   example: null
+ * components:
+ *   securitySchemes:
+ *     cookieAuth:
+ *       type: apiKey
+ *       in: cookie
+ *       name: connect.sid
+ */
+router.get('/status', isAuthenticated, async (req, res) => {
+    return res.status(200).send(StandardResponse(
+        true,
+        "User status.",
+        null,
+        null
+    ));
+});
 
 export default router;
