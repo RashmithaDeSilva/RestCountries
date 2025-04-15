@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Navbar from '@/components/userNavbar';
+import Navbar from '@/components/UserNavbar';
 import axios from 'axios';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import { FaSync, FaEdit, FaTrash, FaPlus, FaCheck, FaTimes, FaCopy } from 'react-icons/fa';

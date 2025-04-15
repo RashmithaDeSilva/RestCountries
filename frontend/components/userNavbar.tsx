@@ -5,17 +5,19 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { User, LogOut } from "lucide-react";
+import NotificationBox from "@/components/NotificationBox"; // Adjust if path differs
 
 export default function Navbar() {
   const router = useRouter();
   const [csrf, setCsrf] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [notification, setNotification] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
-  // Show error popup
-  const showError = (msg: string) => {
-    setError(msg);
-    setTimeout(() => setError(null), 1000);
+  const showNotification = (type: "success" | "error", message: string) => {
+    setNotification({ type, message });
   };
 
   const forceLogout = () => {
@@ -23,18 +25,18 @@ export default function Navbar() {
     router.push("/login");
   };
 
-  // Check user status every 5s
+  // Check user status every 5 seconds
   useEffect(() => {
     const checkStatus = async () => {
       try {
         const res = await axios.get("/api/auth/user/status");
         if (!res?.data?.status) {
-          showError("Unauthorized. Redirecting...");
+          showNotification("error", "Unauthorized. Redirecting...");
           forceLogout();
         }
       } catch (err) {
         console.error("User status error:", err);
-        showError("Error checking user status.");
+        showNotification("error", "Error checking user status.");
         forceLogout();
       }
     };
@@ -51,31 +53,41 @@ export default function Navbar() {
         const response = await axios.get("/api/auth/csrf-token");
         if (response.status === 200) {
           setCsrf(response.data.data.CSRF_Token);
+        } else {
+          showNotification("error", "Failed to fetch CSRF token.");
         }
       } catch (err) {
-        console.error("Failed to fetch CSRF");
-        showError("Failed to fetch CSRF token.");
+        console.error("CSRF fetch error:", err);
+        showNotification("error", "Failed to fetch CSRF token.");
       }
     };
     fetchCsrf();
   }, []);
 
   const handleLogout = async () => {
-    if (!csrf) return;
     setLoading(true);
     try {
-      const res = await axios.post("/api/auth/logout", { _csrf: csrf });
+      // Always fetch a fresh CSRF token before logout
+      const csrfRes = await axios.get("/api/auth/csrf-token");
+      const freshCsrf = csrfRes.data.data.CSRF_Token;
+  
+      const res = await axios.post("/api/auth/logout", { _csrf: freshCsrf });
       if (res.status === 200 && res.data.status) {
         forceLogout();
       } else {
-        showError("Logout failed.");
+        showNotification("error", "Logout failed.");
       }
-    } catch (error) {
-      showError("Logout failed.");
+    } catch (err: any) {
+      console.error("Logout error:", err);
+      if (err?.response?.status === 403) {
+        showNotification("error", "CSRF token expired. Please try again.");
+      } else {
+        showNotification("error", "Logout failed.");
+      }
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   return (
     <>
@@ -86,7 +98,7 @@ export default function Navbar() {
 
         <div className="flex items-center gap-8">
           <button
-            onClick={() => router.push("/user/details")}
+            onClick={() => router.push("/user/info")}
             className="hover:text-green-400 transition duration-200"
             title="User Details"
           >
@@ -104,10 +116,12 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {error && (
-        <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in-out">
-          {error}
-        </div>
+      {notification && (
+        <NotificationBox
+          type={notification.type}
+          message={notification.message}
+          duration={5000}
+        />
       )}
     </>
   );

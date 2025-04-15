@@ -7,8 +7,10 @@ import UserService from '../services/UserService.mjs';
 import CommonErrors from '../utils/errors/CommonErrors.mjs';
 import isAuthenticated from '../middlewares/UserAuthMiddleware.mjs';
 import DashboardService from '../services/DashboadService.mjs';
+import ErrorResponse from '../utils/responses/ErrorResponse.mjs';
 
 dotenv.config();
+const ENV = process.env.ENV;
 const router = Router();
 const userService = new UserService();
 const dashboardService = new DashboardService();
@@ -117,7 +119,7 @@ router.get('/info', isAuthenticated, (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               firstName:
+ *               first_name:
  *                 type: string
  *                 example: "John"
  *               surname:
@@ -126,7 +128,7 @@ router.get('/info', isAuthenticated, (req, res) => {
  *               email:
  *                 type: string
  *                 example: "john.doe@example.com"
- *               contactNumber:
+ *               contact_number:
  *                 type: string
  *                 example: "+94761234567"
  *     responses:
@@ -231,7 +233,7 @@ router.put('/update', isAuthenticated, [
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, null, errors);
+        return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, '/user/update/', errors);
     }
 
     const data = matchedData(req);
@@ -270,15 +272,15 @@ router.put('/update', isAuthenticated, [
  *           schema:
  *             type: object
  *             properties:
- *               oldPassword:
+ *               old_password:
  *                 type: string
  *                 format: password
  *                 example: "oldPassword123"
- *               newPassword:
+ *               password:
  *                 type: string
  *                 format: password
  *                 example: "NewStrongPassword123!"
- *               confirmPassword:
+ *               confirm_password:
  *                 type: string
  *                 format: password
  *                 example: "NewStrongPassword123!"
@@ -404,7 +406,7 @@ router.patch('/changepassword', isAuthenticated, [
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, null, errors);
+        return await ErrorResponse(new Error(CommonErrors.VALIDATION_ERROR), res, '/user/changepassword', errors);
     }
 
     const data = matchedData(req);

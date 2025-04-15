@@ -382,7 +382,6 @@ router.post('/register', [
  */
 router.post('/logout', isAuthenticated, async (req, res) => {
     const logOutAsync = promisify(req.logOut).bind(req);
-
     try {
         await logOutAsync();
         return res.status(200).send(StandardResponse(
