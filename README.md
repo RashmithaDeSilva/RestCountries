@@ -53,7 +53,7 @@ It supports user registration, login, and API key management, with secure data s
 - **Database**: MySQL (Production), SQLite (Development)
 - **Caching**: Redis (Session and Cache storage)
 - **Containerization**: Docker
-- **Authentication**: Passport JS
+- **Authentication**: Passport JS and Tiny CSRF
 - **API Documentation**: Swagger
 
 ---
@@ -90,7 +90,7 @@ sh run.sh test      # Test
 ```bash
 docker-compose up -d
 ```
-This builds and runs Docker containers for the backend, Redis, MySQL (production), and SQLite (development).
+This pull and runs Docker containers for the backend, frontend, Redis, MySQL (production).
 
 ---
 
