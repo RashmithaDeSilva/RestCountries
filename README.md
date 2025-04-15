@@ -1,17 +1,39 @@
-# 6COSC022C.2 CW 1 Secure API Middleware Service 
+# 6COSC022C.2 CW 1 Secure API Middleware Service with Frontend
+
+![alt text](readme-imgs/home.png)
 
 ## Overview
 
 This project implements a secure API middleware service that interfaces with [RestCountries.com](https://restcountries.com), a RESTful service providing detailed information about countries worldwide. The application serves as an intermediary layer, processing and filtering country data while enforcing robust security measures.
 
-### Key Features:
+### 🔑 Key Features:
 - **API Integration**: Retrieve country data (name, currency, capital, languages, flag) from RestCountries.
 - **Authentication**: Complete user management system with registration, login, password hashing, and session management.
-- **API Key Management**: Users can generate and manage API keys.
+- **API Key Management**: Users can generate, rename, and delete API keys.
+- **Admin Dashboard**: Admins can view total user and admin statistics, with dynamic circular meters and structured analytics.
+- **User Dashboard**: Users can view their API usage, manage keys (create, regenerate, rename, delete), and track their subscription plan.
+- **Frontend Interface**: Fully responsive and visually appealing frontend with smooth animations, modals, error popups, and form validations.
 - **Security**: The system includes comprehensive security practices, including input validation, password hashing, and session management.
 - **Containerization**: The application is fully containerized using Docker for seamless deployment.
 
-## Project Scope
+## 🖥 Frontend Pages Overview
+
+- **Homepage**: Showcases animated globe visual, service features, and pricing plans. Scroll animations enhance user experience.
+- **User Dashboard**: Left-side navigation, usage meter, key management panel, and account settings.
+- **Admin Dashboard**: Stats overview with meters and detailed control panels.
+- **User Info Page**: Editable user details form with masked password updates.
+
+## 📸 UI Snapshots
+
+### 👤 User Dashboard
+![_Image Placeholder_](readme-imgs/user-dashboard.png)
+
+### 🛠 Admin Dashboard
+![_Image Placeholder_](readme-imgs/admin-dashboard.png)
+
+---
+
+## 📦 Project Scope
 
 The application retrieves data from [RestCountries API](https://restcountries.com) and exposes the following country information:
 - Country Name
@@ -20,23 +42,28 @@ The application retrieves data from [RestCountries API](https://restcountries.co
 - Spoken Languages
 - National Flag
 
-It supports user registration, login capabilities, and API key management with secure data storage in an SQLite database. The system implements robust security measures, including password hashing, session management, and API key validation.
+It supports user registration, login, and API key management, with secure data storage in an SQLite or MySQL database. Dashboards for both users and admins provide full control and visibility over account usage and system stats.
 
-## Technologies Used
+---
 
+## ⚙️ Technologies Used
+
+- **Frontend**: Next.js, TypeScript, Tailwind CSS, Framer Motion
 - **Backend**: Express (Node.js) with ECMAScript Modules (`.mjs` format)
 - **Database**: MySQL (Production), SQLite (Development)
 - **Caching**: Redis (Session and Cache storage)
 - **Containerization**: Docker
-- **API Documentation**: Swagger
 - **Authentication**: Passport JS
+- **API Documentation**: Swagger
 
-## Setup Instructions
+---
+
+## 🚀 Setup Instructions
 
 ### Prerequisites
 - Node.js (v14 or later)
 - Docker
-- MySQL (for production environment)
+- MySQL (for production)
 - Redis (for session and cache storage)
 
 ### 1. Clone the Repository
@@ -46,68 +73,81 @@ git clone https://github.com/RashmithaDeSilva/6COSC022C.2_CW1.git
 cd 6COSC022C.2_CW1
 ```
 
-### 2. Run Application
-
-Run the following command to run the aplication:
+### 2. Run the Application
 
 ```bash
 # Windows
 double click run.bat
 
-# Linux
-sh run.sh dev
-sh run.sh prod
-sh run.sh test
+# Linux/macOS
+sh run.sh dev       # Development
+sh run.sh prod      # Production
+sh run.sh test      # Test
 ```
 
 ### 3. Docker Setup
 
-To run the application using Docker, build and run the containers:
-
 ```bash
 docker-compose up -d
 ```
+This builds and runs Docker containers for the backend, Redis, MySQL (production), and SQLite (development).
 
-This command will build the Docker images for all services and start the containers. It will set up the application, Redis, MySQL (for production), and SQLite (for development).
+---
 
-### 4. Database Configuration
+## 🗃 Database Configuration
 
-- For development, SQLite is used automatically.
-- For production, MySQL should be set up. Update the `.env` file with your MySQL credentials:
+* Development: SQLite is used automatically.
+* Production: Configure .env for MySQL:
 
 ```env
-DB_HOST=localhost
-DB_USER=yourusername
-DB_PASSWORD=yourpassword
-DB_NAME=yourdb
+# MySQL database detals
+MYSQL_DB_HOST=localhost
+MYSQL_DB_USER=root
+MYSQL_DB_PASSWORD=12345
+DB_NAME=restcountries
+
+# Redis session store
+REDIS_SESSION_STORE_HOST=localhost
+REDIS_SESSION_STORE_PORT=6379
 ```
 
-### 5. API Documentation
+---
 
-Swagger is set up for API documentation. Once the app is running, access the Swagger UI at (only works on DEV env):
+## 📡 API Endpoints
 
-```bash
-http://localhost:3001/api/v1/api-docs
-```
+### 🔐 Authentication & User Management
+* POST /api/v1/auth/register – Register user
+* POST /api/v1/auth/login – Login user
 
-### 6. Accessing the API
+### 🧾 Country Data
+* GET /api/v1/auth/restcountry – Get country info
 
-- **User Registration**: `POST /api/v1/auth/register`
-- **User Login**: `POST /api/v1/auth/login`
-- **Generate API Key**: `PATCH /api/v1/auth/user/apikey/generatenewkey`
-- **Get Country Info**: `GET /api/v1/auth/restcountry`
+### 🔑 API Key Management
+* PATCH /api/v1/auth/user/apikey/generatenewkey
+* POST /api/v1/auth/user/apikey/create
+* PATCH /api/v1/auth/user/apikey/rename
+* DELETE /api/v1/auth/user/apikey/delete
 
-### 7. Running Locally
+### 🧍 User Info
+* GET /api/auth/user/info
+* PUT /api/auth/user/update
+* PATCH /api/auth/user/changepassword
 
-To run the application locally without Docker, ensure your dependencies are installed and configure your database settings in the `.env` file. Then, run the application:
+### 🛡 Admin Dashboard
+* GET /api/auth/admin/dashbord – View admin stats
 
-```bash
-npm start
-```
+---
 
-## Security Measures
+## 🔐 Security Measures
+* Password Hashing: bcrypt-secured user passwords.
+* Session Management: Secure sessions using Redis.
+* API Key Enforcement: Valid key required for API access.
+* Input Sanitization: Prevents SQL Injection, XSS, and other attacks.
+* csrf setup
 
-- **Password Hashing**: All user passwords are securely hashed using bcrypt.
-- **Session Management**: Redis is used to store user sessions, ensuring secure access control.
-- **API Key Validation**: All API endpoints require a valid API key for access.
-- **Input Validation**: All input is sanitized to prevent injection attacks and other vulnerabilities.
+---
+
+## 🎉 Final Notes
+This project delivers a full-stack secure API gateway system with user and admin dashboards, seamless API integration, and a stunning frontend. Ideal for expanding to SaaS-style country data platforms.
+
+---
