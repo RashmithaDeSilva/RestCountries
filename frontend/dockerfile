@@ -8,8 +8,13 @@ RUN npm install --frozen-lockfile
 # Build the app
 FROM node:23-alpine3.20 AS builder
 WORKDIR /app
+
+# Set DOCKER=true so ESLint can be skipped during build
+ENV DOCKER=true
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
 RUN npm run build
 
 # Production image

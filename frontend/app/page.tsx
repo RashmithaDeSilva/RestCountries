@@ -80,7 +80,7 @@ export default function Home() {
             backgroundColor="rgba(0,0,0,0)"
             width={windowSize.width}
             height={windowSize.height}
-            globeRadius={globeZoom}
+            // globeRadius={globeZoom}
           />
         )}
 
