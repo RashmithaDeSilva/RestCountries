@@ -113,11 +113,11 @@ class ApiKeyService {
     // Check if user can create more api key
     async canUserCreateApiKey(userId) {
         try {
-            const subscriptionId = await this.subscriptionUserService.getUserSubscription(userId);
-            const subscription = await this.subscriptionTypeService.getSubscriptionType(subscriptionId);
+            const subscriptionDetails = await this.subscriptionUserService.getUserSubscriptionDetails(userId);
+            const apiKeyLimit = await this.subscriptionTypeService.getSubscriptionRequestLimit(subscriptionDetails.subscription_id);
             const usersCurrentApiKeyCount = await this.apiKeyDAO.getUsersCurrentApiKeyCount(userId);
 
-            return !(usersCurrentApiKeyCount >= subscription.apiKeyLimit)
+            return !(usersCurrentApiKeyCount >= apiKeyLimit)
 
         } catch (error) {
             throw error;

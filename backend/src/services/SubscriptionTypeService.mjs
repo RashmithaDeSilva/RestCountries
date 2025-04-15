@@ -18,15 +18,15 @@ class SubscriptionTypeService {
         }
     }
 
-    // Get subscription type
-    async getSubscriptionType(subId) {
-        try {
-            return await this.subscriptionTypesDAO.getSubscriptionType(subId);
+    // // Get subscription type
+    // async getSubscriptionType(subId) {
+    //     try {
+    //         return await this.subscriptionTypesDAO.getSubscriptionType(subId);
             
-        } catch (error) {
-            throw error;
-        }
-    }
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
 
     // Get subscription types count
     async getSubscriptionTypesCount() {

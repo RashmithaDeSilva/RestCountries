@@ -29,8 +29,8 @@ export default function Login() {
         // If login is successful, set the token in cookies
         document.cookie = `token=${response.data.data}; path=/;`;
 
-        // Redirect to the home page
-        router.push("/");
+        // Redirect to the user page
+        router.push("/user");
       } else {
         setErrorMessage("Something went wrong, please try again.");
       }

@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*", // Any request to /api/... will be redirected
-        destination: "http://192.168.1.4:6001/api/v1/:path*", // Your Flask backend
+        destination: "http://192.168.1.6:6001/api/v1/:path*", // Your Flask backend
       },
     ];
   },

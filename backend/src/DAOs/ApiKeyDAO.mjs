@@ -51,7 +51,7 @@ class ApiKeyDAO {
     async getApiKeysByUserId(userId) {
         try {
             const [row] = await pool.query(`SELECT api_key, key_name FROM api_keys WHERE user_id = ?`, [userId]);
-            return row.length === 0 ? null : row;
+            return row.length === 0 ? [] : row;
 
         } catch (error) {
             throw error;
