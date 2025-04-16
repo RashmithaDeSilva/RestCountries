@@ -16,6 +16,9 @@ This project implements a secure API middleware service that interfaces with [Re
 - **Security**: The system includes comprehensive security practices, including input validation, password hashing, and session management.
 - **Containerization**: The application is fully containerized using Docker for seamless deployment.
 
+## Architecture Diagram
+![alt text](<readme-imgs/RestCountries Architecture Diagram.png>)
+
 ## 🖥 Frontend Pages Overview
 
 - **Homepage**: Showcases animated globe visual, service features, and pricing plans. Scroll animations enhance user experience.
