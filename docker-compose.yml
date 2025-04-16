@@ -11,51 +11,53 @@ services:
   mysql:
     image: mysql
     container_name: main_database
-    restart: unles-stop
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: 12345
-      MYSQL_DATABASE: restcountries.db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
       - "3306:3306"
     networks:
-      - restcountries_network
+      restcountries_network:
+        ipv4_address: 172.20.5.2
 
   redis:
     image: redis:7.4-alpine3.21
-    container_name: session_store
-    restart: unles-stop
+    container_name: session_cache_store
+    restart: unless-stopped
     ports:
       - "6379:6379"
     networks:
-      - restcountries_network
+      restcountries_network:
+        ipv4_address: 172.20.5.3
 
   api:
-    # build:
-    #   context: ./backend
-    #   dockerfile: ./Dockerfile
     image: rashmithadesilva/restcountries_api:v1
     container_name: api
-    restart: unles-stop
+    restart: unless-stopped
     working_dir: /app
     ports:
-      - "3001:3001"
+      - "3001:6001"
+    env_file:
+      - ./backend/.env
     networks:
-      - restcountries_network
+      restcountries_network:
+        ipv4_address: 172.20.5.4
     depends_on:
       - mysql
       - redis
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: ./Dockerfile
-    # image: rashmithadesilva/restcountries_frontend:v1
+    image: rashmithadesilva/restcountries_frontend:v1
     container_name: frontend
-    restart: unles-stop
+    restart: unless-stopped
     working_dir: /app
     ports:
-      - "3000:3000"
+      - "3000:4000"
+    env_file:
+      - ./frontend/.env
     networks:
-      - restcountries_network
+      restcountries_network:
+        ipv4_address: 172.20.5.5
     depends_on:
       - api

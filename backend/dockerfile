@@ -1,19 +1,24 @@
+# Use a smaller base image
 FROM node:23-alpine3.20
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
+# Install dependencies only when needed
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies (only production dependencies for smaller size)
+RUN npm ci --omit=dev
 
-# Copy the rest of the application
+# Copy only necessary files
 COPY . .
 
-# Expose port 3001
+# Expose the port
 EXPOSE 3001
+
+# Use a non-root user (optional but recommended for security)
+RUN addgroup app && adduser -S -G app app
+USER app
 
 # Start the application
 CMD ["npm", "run", "start"]

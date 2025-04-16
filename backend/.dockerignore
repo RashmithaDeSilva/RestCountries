@@ -4,3 +4,6 @@ Dockerfile
 cw1.db
 restcountries.db
 .env
+.gitignore
+.git
+npm-debug.log

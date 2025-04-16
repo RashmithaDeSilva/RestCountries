@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { User, LogOut } from "lucide-react";
-import NotificationBox from "@/components/NotificationBox"; 
+import { useEffect, useState, useCallback } from "react";
+import axios, { AxiosError } from "axios"; // Import AxiosError
+import { LogOut } from "lucide-react";
+import NotificationBox from "@/components/NotificationBox";
 
 export default function Navbar() {
   const router = useRouter();
@@ -20,10 +20,11 @@ export default function Navbar() {
     setNotification({ type, message });
   };
 
-  const forceLogout = () => {
+  // Memoize forceLogout function using useCallback to prevent unnecessary re-renders
+  const forceLogout = useCallback(() => {
     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     router.push("/admin");
-  };
+  }, [router]); // Add router as a dependency to prevent stale closures
 
   // Check user status every 5 seconds
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function Navbar() {
     checkStatus();
     const interval = setInterval(checkStatus, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [forceLogout]); // Add forceLogout to the dependency array
 
   // Fetch CSRF token
   useEffect(() => {
@@ -70,24 +71,28 @@ export default function Navbar() {
       // Always fetch a fresh CSRF token before logout
       const csrfRes = await axios.get("/api/auth/csrf-token");
       const freshCsrf = csrfRes.data.data.CSRF_Token;
-  
+
       const res = await axios.post("/api/auth/admin/logout", { _csrf: freshCsrf });
       if (res.status === 200 && res.data.status) {
         forceLogout();
       } else {
         showNotification("error", "Logout failed.");
       }
-    } catch (err: any) {
+    } catch (err: unknown) { // Type catch clause variable as unknown
       console.error("Logout error:", err);
-      if (err?.response?.status === 403) {
-        showNotification("error", "CSRF token expired. Please try again.");
+      if (err instanceof AxiosError) { // Check if the error is an AxiosError
+        if (err?.response?.status === 403) {
+          showNotification("error", "CSRF token expired. Please try again.");
+        } else {
+          showNotification("error", "Logout failed.");
+        }
       } else {
-        showNotification("error", "Logout failed.");
+        showNotification("error", "An unexpected error occurred.");
       }
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   return (
     <>
@@ -97,14 +102,7 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-8">
-          {/* <button
-            onClick={() => router.push("/user/info")}
-            className="hover:text-green-400 transition duration-200"
-            title="User Details"
-          >
-            <User className="w-7 h-7" />
-          </button> */}
-
+          {/* Removed unused User button */}
           <button
             onClick={handleLogout}
             disabled={loading || !csrf}

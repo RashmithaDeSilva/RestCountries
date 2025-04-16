@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
@@ -24,26 +24,31 @@ export default function AdminDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  // Show Notification function
-  const showNotification = ({ message, type }: { message: string; type: 'success' | 'error' }) => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 5000); // Hide after 5 seconds
-  };
-
-  // Error handling function
-  const showError = (msg: string) => {
-    showNotification({ type: 'error', message: msg });
-  };
-
   // Fetch Dashboard data
-  const fetchDashboard = async () => {
+  const fetchDashboard = useCallback(async () => {
+    // Show Notification function inside useCallback
+    const showNotification = ({ message, type }: { message: string; type: 'success' | 'error' }) => {
+      setNotification({ message, type });
+      setTimeout(() => setNotification(null), 5000); // Hide after 5 seconds
+    };
+
+    const showError = (msg: string) => {
+      showNotification({ type: 'error', message: msg });
+    };
+
     try {
       const res = await axios.get('/api/auth/admin/dashboard');
-      setData(res.data.data);
+      if (res.status === 200 && res.data.data) {
+        setData(res.data.data);
+        setNotification(null); // Clear any previous error notifications on success
+      } else {
+        throw new Error('Unexpected response format');
+      }
     } catch (err) {
+      console.log(err);
       showError('Failed to load admin dashboard.');
     }
-  };
+  }, []); // No need to include showNotification in the dependency array anymore
 
   useEffect(() => {
     fetchDashboard();
@@ -53,7 +58,7 @@ export default function AdminDashboard() {
     }, 5000); // Poll every 5 seconds
 
     return () => clearInterval(intervalId); // Clean up the interval on component unmount
-  }, []);
+  }, [fetchDashboard]);
 
   return (
     <div className="min-h-screen bg-gray-100 text-black">

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Link from "next/link";
 
 export default function SignUp() {
@@ -21,7 +21,6 @@ export default function SignUp() {
     setIsLoading(true);
     setErrorMessage("");
 
-    // Simple validation check to ensure passwords match
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match.");
       setIsLoading(false);
@@ -39,16 +38,17 @@ export default function SignUp() {
       });
 
       if (response.status === 201 && response.data.status) {
-        // On successful registration, redirect to the login page
         router.push("/login");
       } else {
         setErrorMessage(response.data.message || "Something went wrong.");
       }
-    } catch (err: any) {
-      if (err?.response?.status === 400) {
-        const errors = err?.response?.data?.errors;
+    } catch (err: unknown) {
+      const axiosError = err as AxiosError;
+
+      if (axiosError.response?.status === 400) {
+        const errors = (axiosError.response.data as { errors?: string[] })?.errors;
         setErrorMessage(errors?.join(", ") || "Validation error.");
-      } else if (err?.response?.status === 500) {
+      } else if (axiosError.response?.status === 500) {
         setErrorMessage("Internal server error, please try again later.");
       } else {
         setErrorMessage("An unknown error occurred.");
@@ -66,7 +66,6 @@ export default function SignUp() {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* First Name */}
           <div>
             <label htmlFor="first_name" className="text-white block text-sm">
               First Name
@@ -81,7 +80,6 @@ export default function SignUp() {
             />
           </div>
 
-          {/* Surname */}
           <div>
             <label htmlFor="surname" className="text-white block text-sm">
               Surname
@@ -96,7 +94,6 @@ export default function SignUp() {
             />
           </div>
 
-          {/* Email */}
           <div>
             <label htmlFor="email" className="text-white block text-sm">
               Email
@@ -111,7 +108,6 @@ export default function SignUp() {
             />
           </div>
 
-          {/* Contact Number */}
           <div>
             <label htmlFor="contact_number" className="text-white block text-sm">
               Contact Number
@@ -126,7 +122,6 @@ export default function SignUp() {
             />
           </div>
 
-          {/* Password */}
           <div>
             <label htmlFor="password" className="text-white block text-sm">
               Password
@@ -141,7 +136,6 @@ export default function SignUp() {
             />
           </div>
 
-          {/* Confirm Password */}
           <div>
             <label htmlFor="confirm_password" className="text-white block text-sm">
               Confirm Password
@@ -156,7 +150,6 @@ export default function SignUp() {
             />
           </div>
 
-          {/* Sign Up Button */}
           <button
             type="submit"
             className={`w-full p-3 mt-4 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold ${
@@ -168,7 +161,6 @@ export default function SignUp() {
           </button>
         </form>
 
-        {/* Error Message Popup */}
         {errorMessage && (
           <div className="absolute top-20 right-4 bg-red-600 text-white p-3 rounded-lg">
             <p>{errorMessage}</p>
@@ -176,7 +168,6 @@ export default function SignUp() {
         )}
       </div>
 
-      {/* Back to Home Button */}
       <Link href="/">
         <button className="mt-8 bg-blue-500 hover:bg-blue-400 px-4 py-2 rounded-lg font-semibold text-white mb-6">
           Back to Home

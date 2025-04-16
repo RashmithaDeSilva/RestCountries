@@ -1,7 +1,10 @@
+note.txt
+.env
+
+
 # Backend ---------------------------------------------------------------
 /backend/node_modules/
 /backend/.env
-note.txt
 /backend/cw1.db
 /backend/restcountries.db
 

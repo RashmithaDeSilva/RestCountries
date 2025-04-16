@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState, useCallback } from "react";
+import axios, { AxiosError } from "axios"; // Import AxiosError
 import { User, LogOut } from "lucide-react";
 import NotificationBox from "@/components/NotificationBox"; 
 
@@ -20,10 +20,10 @@ export default function Navbar() {
     setNotification({ type, message });
   };
 
-  const forceLogout = () => {
+  const forceLogout = useCallback(() => {
     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     router.push("/login");
-  };
+  }, [router]); // Add router as a dependency
 
   // Check user status every 5 seconds
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function Navbar() {
     checkStatus();
     const interval = setInterval(checkStatus, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [forceLogout]); // Add forceLogout to the dependency array
 
   // Fetch CSRF token
   useEffect(() => {
@@ -77,12 +77,16 @@ export default function Navbar() {
       } else {
         showNotification("error", "Logout failed.");
       }
-    } catch (err: any) {
+    } catch (err: unknown) { // Type catch clause variable as unknown
       console.error("Logout error:", err);
-      if (err?.response?.status === 403) {
-        showNotification("error", "CSRF token expired. Please try again.");
+      if (err instanceof AxiosError) { // Check if the error is an AxiosError
+        if (err?.response?.status === 403) {
+          showNotification("error", "CSRF token expired. Please try again.");
+        } else {
+          showNotification("error", "Logout failed.");
+        }
       } else {
-        showNotification("error", "Logout failed.");
+        showNotification("error", "An unexpected error occurred.");
       }
     } finally {
       setLoading(false);

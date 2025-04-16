@@ -1,10 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Navbar from '@/components/UserNavbar';
 import axios from 'axios';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import { FaSync, FaEdit, FaTrash, FaPlus, FaCheck, FaTimes, FaCopy } from 'react-icons/fa';
+import {
+  FaSync,
+  FaEdit,
+  FaTrash,
+  FaPlus,
+  FaCheck,
+  FaTimes,
+  FaCopy,
+} from 'react-icons/fa';
 import 'react-circular-progressbar/dist/styles.css';
 
 interface ApiKey {
@@ -13,7 +21,6 @@ interface ApiKey {
 }
 
 export default function UserDashboard() {
-  const [csrf, setCsrf] = useState('');
   const [usage, setUsage] = useState(0);
   const [limit, setLimit] = useState(1000);
   const [plan, setPlan] = useState('Free');
@@ -24,22 +31,17 @@ export default function UserDashboard() {
   const [showPopup, setShowPopup] = useState(false);
   const [popupKeyName, setPopupKeyName] = useState('');
 
-  useEffect(() => {
-    fetchDashboard();
-    fetchApiKeys();
-
-    const interval = setInterval(fetchDashboard, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
   const fetchCSRF = async (): Promise<string> => {
     const res = await axios.get('/api/auth/csrf-token');
-    const token = res.data.data.CSRF_Token;
-    setCsrf(token);
-    return token;
+    return res.data.data.CSRF_Token;
   };
 
-  const fetchDashboard = async () => {
+  const showError = (msg: string) => {
+    setError(msg);
+    setTimeout(() => setError(''), 5000);
+  };
+
+  const fetchDashboard = useCallback(async () => {
     try {
       const res = await axios.get('/api/auth/user/dashboard');
       const data = res.data.data;
@@ -49,23 +51,26 @@ export default function UserDashboard() {
     } catch {
       showError('Failed to load dashboard');
     }
-  };
+  }, []);
 
-  const fetchApiKeys = async () => {
+  const fetchApiKeys = useCallback(async () => {
     try {
       const res = await axios.get('/api/auth/user/apikey');
       setApiKeys(res.data.data);
     } catch {
       showError('Failed to load API keys');
     }
-  };
+  }, []);
 
-  const showError = (msg: string) => {
-    setError(msg);
-    setTimeout(() => setError(''), 5000);
-  };
+  useEffect(() => {
+    fetchDashboard();
+    fetchApiKeys();
 
-  const handleCreateKey = async () => {
+    const interval = setInterval(fetchDashboard, 5000);
+    return () => clearInterval(interval);
+  }, [fetchDashboard, fetchApiKeys]);
+
+  const handleCreateKey = () => {
     if (plan === 'Free' && apiKeys.length > 0) {
       showError('Free plan users can only have 1 API key.');
       return;
@@ -78,8 +83,9 @@ export default function UserDashboard() {
       showError('API key name is required');
       return;
     }
-    const csrfToken = await fetchCSRF();
+
     try {
+      const csrfToken = await fetchCSRF();
       await axios.post('/api/auth/user/apikey/createnewkey', {
         api_key_name: popupKeyName,
         _csrf: csrfToken,
@@ -87,33 +93,45 @@ export default function UserDashboard() {
       fetchApiKeys();
       setShowPopup(false);
       setPopupKeyName('');
-    } catch (err: any) {
-      showError(err.response?.data?.message || 'Failed to create key');
+    } catch (err: unknown) {
+      const message =
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : 'Failed to create key';
+      showError(message);
     }
   };
 
   const regenerateKey = async (keyName: string) => {
-    const csrfToken = await fetchCSRF();
     try {
+      const csrfToken = await fetchCSRF();
       await axios.patch('/api/auth/user/apikey/generatenewkey', {
         api_key_name: keyName,
         _csrf: csrfToken,
       });
       fetchApiKeys();
-    } catch (err: any) {
-      showError(err.response?.data?.message || 'Failed to regenerate key');
+    } catch (err: unknown) {
+      const message =
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : 'Failed to regenerate key';
+      showError(message);
     }
   };
 
   const deleteKey = async (keyName: string) => {
-    const csrfToken = await fetchCSRF();
     try {
+      const csrfToken = await fetchCSRF();
       await axios.delete('/api/auth/user/apikey/delete', {
         data: { api_key_name: keyName, _csrf: csrfToken },
       });
       fetchApiKeys();
-    } catch (err: any) {
-      showError(err.response?.data?.message || 'Failed to delete key');
+    } catch (err: unknown) {
+      const message =
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : 'Failed to delete key';
+      showError(message);
     }
   };
 
@@ -123,8 +141,9 @@ export default function UserDashboard() {
       setNewKeyName('');
       return;
     }
-    const csrfToken = await fetchCSRF();
+
     try {
+      const csrfToken = await fetchCSRF();
       await axios.patch('/api/auth/user/apikey/changename', {
         old_api_key_name: oldName,
         new_api_key_name: newKeyName,
@@ -133,8 +152,12 @@ export default function UserDashboard() {
       fetchApiKeys();
       setEditingKey(null);
       setNewKeyName('');
-    } catch (err: any) {
-      showError(err.response?.data?.message || 'Failed to rename key');
+    } catch (err: unknown) {
+      const message =
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : 'Failed to rename key';
+      showError(message);
     }
   };
 
@@ -181,7 +204,9 @@ export default function UserDashboard() {
                 })}
               />
             </div>
-            <p className="mt-4 text-gray-700">Usage: {usage} / {limit}</p>
+            <p className="mt-4 text-gray-700">
+              Usage: {usage} / {limit}
+            </p>
           </div>
 
           <div className="bg-white text-black rounded-xl shadow-md p-6">

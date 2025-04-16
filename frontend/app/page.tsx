@@ -7,8 +7,19 @@ import Link from "next/link";
 
 const Globe = dynamic(() => import("react-globe.gl"), { ssr: false });
 
+type SubscriptionPlan = {
+  id: string;
+  subscriptionName: string;
+  description: string;
+  subscriptionPrice: number;
+  subscriptionPriceCurrency: string;
+  apiRequestLimit: number;
+  apiKeyLimit: number;
+  functionDescription: string;
+};
+
 export default function Home() {
-  const [subscriptions, setSubscriptions] = useState([]);
+  const [subscriptions, setSubscriptions] = useState<SubscriptionPlan[]>([]);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const [scrollY, setScrollY] = useState(0);
 
@@ -38,12 +49,9 @@ export default function Home() {
 
   useEffect(() => {
     fetch("/api/allSubscriptionTypes")
-      .then(res => res.json())
-      .then(data => setSubscriptions(data.data || []));
+      .then((res) => res.json())
+      .then((data) => setSubscriptions(data.data || []));
   }, []);
-
-  // Calculate zoom level based on scroll position (scale the zoom level as per scroll)
-  const globeZoom = Math.max(1, 3 - scrollY / 300);
 
   // Scroll down to the next section
   const handleScrollDown = () => {
@@ -70,7 +78,7 @@ export default function Home() {
             Sign Up
           </button>
         </Link>
-    </div>
+      </div>
 
       {/* Globe Section */}
       <section className="h-screen w-full flex items-center justify-center relative overflow-hidden">
@@ -80,7 +88,6 @@ export default function Home() {
             backgroundColor="rgba(0,0,0,0)"
             width={windowSize.width}
             height={windowSize.height}
-            // globeRadius={globeZoom}
           />
         )}
 
@@ -104,7 +111,7 @@ export default function Home() {
         className="snap-start min-h-screen px-8 py-20 bg-black text-white flex items-center justify-center opacity-0 transform translate-y-20 transition-all duration-700"
         style={{
           opacity: scrollY > windowSize.height * 0.5 ? 1 : 0,
-          transform: scrollY > windowSize.height * 0.5 ? "translateY(0)" : "translateY(20px)"
+          transform: scrollY > windowSize.height * 0.5 ? "translateY(0)" : "translateY(20px)",
         }}
       >
         <div className="text-center space-y-8">
@@ -121,7 +128,7 @@ export default function Home() {
         className="snap-start min-h-screen px-8 py-20 bg-gradient-to-br from-black to-blue-900 opacity-0 transform translate-y-20 transition-all duration-700"
         style={{
           opacity: scrollY > windowSize.height * 1.5 ? 1 : 0,
-          transform: scrollY > windowSize.height * 1.5 ? "translateY(0)" : "translateY(20px)"
+          transform: scrollY > windowSize.height * 1.5 ? "translateY(0)" : "translateY(20px)",
         }}
       >
         <h2 className="text-6xl font-bold mb-10 text-blue-400 text-center">Plans & Packages</h2>

@@ -2,13 +2,24 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Link from "next/link";
+
+// Define interfaces for response data
+interface ValidationError {
+  msg: {
+    error: string;
+  };
+}
+
+interface ErrorResponseData {
+  status: boolean;
+  errors?: ValidationError[];
+}
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
@@ -16,7 +27,6 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // setError(null);
     setErrorMessage("");
 
     try {
@@ -29,23 +39,26 @@ export default function Login() {
         // If login is successful, set the token in cookies
         document.cookie = `token=${response.data.data}; path=/;`;
 
-        // Redirect to the user page
+        // Redirect to the admin dashboard
         router.push("/user");
       } else {
         setErrorMessage("Something went wrong, please try again.");
       }
-    } catch (err: any) {
-      if (err?.response?.status === 400) {
-        // Validation error (bad input)
-        const errors = err?.response?.data?.errors;
-        if (errors && errors.length > 0) {
-          setErrorMessage(errors[0]?.msg.error || "Invalid data submitted");
+    } catch (err: unknown) {
+      const error = err as AxiosError;
+      const data = error.response?.data;
+
+      // Check for 400 status and validate the error response type
+      if (error.response?.status === 400) {
+        if (isValidationErrorResponse(data)) {
+          const errors = data.errors;
+          if (errors && errors.length > 0) {
+            setErrorMessage(errors[0]?.msg?.error || "Invalid data submitted");
+          }
         }
-      } else if (err?.response?.status === 401) {
-        // Authentication failed
+      } else if (error.response?.status === 401) {
         setErrorMessage("Invalid email or password.");
-      } else if (err?.response?.status === 500) {
-        // Internal server error
+      } else if (error.response?.status === 500) {
         setErrorMessage("Internal server error, please try again later.");
       } else {
         setErrorMessage("An unknown error occurred.");
@@ -54,6 +67,16 @@ export default function Login() {
       setIsLoading(false);
     }
   };
+
+  // Type guard to check if the error response matches our expected format
+  function isValidationErrorResponse(data: unknown): data is ErrorResponseData {
+    return (
+      typeof data === "object" &&
+      data !== null &&
+      "errors" in data &&
+      Array.isArray((data as ErrorResponseData).errors)
+    );
+  }
 
   return (
     <main className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-900 to-black">

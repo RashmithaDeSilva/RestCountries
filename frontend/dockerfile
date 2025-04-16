@@ -2,32 +2,45 @@
 FROM node:23-alpine3.20 AS deps
 WORKDIR /app
 
+# Only copy package.json and lock files
 COPY package.json package-lock.json* pnpm-lock.yaml* ./
-RUN npm install --frozen-lockfile
+
+# Install production dependencies only
+RUN npm install --production --frozen-lockfile
 
 # Build the app
 FROM node:23-alpine3.20 AS builder
 WORKDIR /app
 
-# Set DOCKER=true so ESLint can be skipped during build
-ENV DOCKER=true
-
+# Copy only the necessary files (node_modules and source code)
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY . . 
 
-RUN npm run build
+# Clean npm cache
+RUN npm cache clean --force
+
+# Install all dependencies (not just production) for building
+RUN npm install --frozen-lockfile && npm run build
 
 # Production image
 FROM node:23-alpine3.20 AS runner
 WORKDIR /app
 
+# Set environment for production
 ENV NODE_ENV=production
 
-# Only include necessary files
+# Only include necessary files in production
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
+
+# Clean up npm cache and unnecessary files to reduce the image size
+RUN npm cache clean --force && rm -rf /root/.npm
+
+# Create non-root user for better security
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
 
 EXPOSE 3000
 

@@ -11,20 +11,24 @@ import dotenv from 'dotenv';
 dotenv.config();
 const cacheStoreService = new CacheStoreService();
 const errorLogService = new ErrorLogService();
+let data;
 
 async function allCountries() {
     try {
         // // Fetch the data from the URL
-        // const response = await fetch(process.env.DATA_RETRIEVE_API || "https://restcountries.com/v3.1/all");
-        // if (!response.ok) {
-        //     throw new Error(CacheStoreErrors.FAILED_TO_FETCH_DATA + `(Response status: ${ response.statusText })`);
-        // }
-        // const data = await response.json();
-        // log(LogTypes.INFO, "All countries data fetched successfully");
+        const response = await fetch(process.env.DATA_RETRIEVE_API || "https://restcountries.com/v3.1/all");
+        if (!response.ok) {
+            log(CacheStoreErrors.FAILED_TO_FETCH_DATA + `(Response status: ${ response.statusText })`);
+            // throw new Error(CacheStoreErrors.FAILED_TO_FETCH_DATA + `(Response status: ${ response.statusText })`);
 
-        // Load data from file
-        const fileData = readFileSync(process.env.DATA_RETRIEVE_FILE || './restcountries.com_v3.1_all.json', 'utf-8')
-        const data = JSON.parse(fileData);
+            // Load data from file
+            const fileData = readFileSync(process.env.DATA_RETRIEVE_FILE || './restcountries.com_v3.1_all.json', 'utf-8')
+            data = JSON.parse(fileData);
+
+        } else {
+            data = await response.json();
+            log(LogTypes.INFO, "All countries data fetched successfully");
+        }
         
         await cacheStoreService.saveCache(new CacheStoreModel("cache:countries", data));
         log(LogTypes.INFO, "All countries cached save successfully");

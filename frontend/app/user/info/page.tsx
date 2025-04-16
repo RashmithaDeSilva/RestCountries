@@ -155,8 +155,13 @@ export default function UserInfoPage() {
       }, 1000);
 
       handleReset();
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || err.message || "Update failed";
+    } catch (err: unknown) {
+      let msg = "Update failed";
+      if (axios.isAxiosError(err)) {
+        msg = err.response?.data?.message || err.message || msg;
+      } else if (err instanceof Error) {
+        msg = err.message;
+      }
       showNotification(msg, "error");
     }
   };
