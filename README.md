@@ -92,6 +92,14 @@ docker-compose up -d
 ```
 This pull and runs Docker containers for the backend, frontend, Redis, MySQL (production).
 
+Imager reporisorys
+```bash
+docker push rashmithadesilva/restcountries_frontend:latest
+docker push rashmithadesilva/restcountries_api:latest
+```
+https://hub.docker.com/r/rashmithadesilva/restcountries_frontend
+https://hub.docker.com/r/rashmithadesilva/restcountries_api
+
 ---
 
 ## 🗃 Database Configuration
