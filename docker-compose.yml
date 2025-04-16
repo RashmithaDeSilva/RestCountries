@@ -32,7 +32,7 @@ services:
         ipv4_address: 172.20.5.3
 
   api:
-    image: rashmithadesilva/restcountries_api:v1
+    image: rashmithadesilva/restcountries_api
     container_name: api
     restart: unless-stopped
     working_dir: /app
@@ -48,7 +48,7 @@ services:
       - redis
 
   frontend:
-    image: rashmithadesilva/restcountries_frontend:v1
+    image: rashmithadesilva/restcountries_frontend
     container_name: frontend
     restart: unless-stopped
     working_dir: /app
